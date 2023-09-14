@@ -1872,6 +1872,7 @@ GameObject:
   - component: {fileID: 164575659}
   - component: {fileID: 164575661}
   - component: {fileID: 164575660}
+  - component: {fileID: 164575662}
   m_Layer: 0
   m_Name: townfolk-f
   m_TagString: Untagged
@@ -2023,6 +2024,20 @@ MonoBehaviour:
   - {fileID: 1085845869}
   - {fileID: 293725032}
   - {fileID: 1201403387}
+--- !u!114 &164575662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 164575655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b90a2a591ed0676468c1b484c9bf72c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  xParam: x
+  yParam: y
 --- !u!1 &293725031
 GameObject:
   m_ObjectHideFlags: 0
