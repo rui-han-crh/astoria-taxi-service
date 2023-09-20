@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2073437482995783176}
   m_Layer: 0
   m_Name: horse1-sprite
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 2073437483198063356}
   m_Layer: 0
   m_Name: carriage-sprite
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -289,7 +289,7 @@ GameObject:
   - component: {fileID: 2073437483941653096}
   m_Layer: 0
   m_Name: horse2-sprite
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -422,7 +422,7 @@ GameObject:
   - component: {fileID: 5492699595595093998}
   m_Layer: 0
   m_Name: horse-carriage-origin
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -453,34 +453,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5492699595595093998}
     m_Modifications:
-    - target: {fileID: 2542709715456426447, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4691182285520101592, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4691182285520101593, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4691182285520101595, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_ConnectedAnchor.y
-      value: 0.94373274
-      objectReference: {fileID: 0}
-    - target: {fileID: 4691182287307354062, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4691182287307354064, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4691182287428408999, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.5
-      objectReference: {fileID: 0}
     - target: {fileID: 6223137107731998002, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
       propertyPath: m_RootOrder
       value: 3

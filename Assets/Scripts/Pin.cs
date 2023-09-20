@@ -37,8 +37,6 @@ namespace Assets.Scripts
                     // Rotate the offset around the parent
                     currentOffset = Quaternion.Euler(0, 0, closestMultipleOf90) * offset;
                 }
-                print(closestMultipleOf90);
-                print(currentOffset);
             }
 
             transform.position = pinnedParent.position + currentOffset;
