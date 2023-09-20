@@ -13,7 +13,7 @@ namespace Assets.Scripts
         public void Awake()
         {
             agentMovement = GetComponent<NavmeshAgentMovement>();
-            agentMovement.SetDestination(SelectRandomWayPoint().position);
+            agentMovement.SetDestination(SelectRandomWayPoint());
 
             agentMovement.OnDestinationReached += OnDestinationReached;
         }
@@ -21,7 +21,7 @@ namespace Assets.Scripts
         private void OnDestinationReached()
         {
             print("Destination reached");
-            agentMovement.SetDestination(SelectRandomWayPoint().position);
+            agentMovement.SetDestination(SelectRandomWayPoint());
         }
 
         private Transform SelectRandomWayPoint()

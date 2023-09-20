@@ -4,49 +4,59 @@ using UnityEngine;
 using UnityEngine.AI;
 using Action = System.Action;
 
-namespace Assets.Scripts
+public class NavmeshAgentMovement : MonoBehaviour
 {
-    internal class NavmeshAgentMovement : MonoBehaviour
+    private Transform target;
+    private NavMeshAgent agent;
+
+    [SerializeField]
+    [Tooltip("The threshold of the agent from the waypoint position before it is considered reached.")]
+    private float approachThreshold = 0.1f;
+
+    public event Action OnDestinationReached;
+
+    private Transform ownedTarget;
+
+    private void Awake()
     {
-        private Vector3 destination;
-        private NavMeshAgent agent;
+        agent = GetComponent<NavMeshAgent>();
+        agent.updateRotation = false;
+        agent.updateUpAxis = false;
 
-        [SerializeField]
-        [Tooltip("The threshold of the agent from the waypoint position before it is considered reached.")]
-        private float threshold = 0.1f;
+        ownedTarget = new GameObject($"navmesh-target-{name}").transform;
+        ownedTarget.position = transform.position;
 
-        public event Action OnDestinationReached;
+        target = ownedTarget;
+    }
 
-        private void Awake()
+    private void Update()
+    {
+        SetAgentPosition();
+
+        if (HasReachedDestination())
         {
-            agent = GetComponent<NavMeshAgent>();
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
+            OnDestinationReached?.Invoke();
         }
+    }
 
-        private void Update()
-        {
-            SetAgentPosition();
+    private bool HasReachedDestination()
+    {
+        return Vector2.Distance(transform.position, target.position) < approachThreshold;
+    }
 
-            if (HasReachedDestination())
-            {
-                OnDestinationReached?.Invoke();
-            }
-        }
+    public void SetDestination(Transform target)
+    {
+        this.target = target;
+    }
 
-        private bool HasReachedDestination()
-        {
-            return Vector2.Distance(transform.position, destination) < threshold;
-        }
+    public void SetDestination(Vector3 position)
+    {
+        ownedTarget.position = position;
+        SetDestination(ownedTarget);
+    }
 
-        public void SetDestination(Vector3 destination)
-        {
-            this.destination = destination;
-        }
-
-        private void SetAgentPosition()
-        {
-            agent.SetDestination(new Vector3(destination.x, destination.y, transform.position.z));
-        }
+    private void SetAgentPosition()
+    {
+        agent.SetDestination(new Vector3(target.position.x, target.position.y, transform.position.z));
     }
 }

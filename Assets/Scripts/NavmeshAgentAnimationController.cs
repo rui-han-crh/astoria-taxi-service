@@ -23,8 +23,8 @@ public class NavmeshAgentAnimationController : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
 
-        xHash = Animator.StringToHash("x");
-        yHash = Animator.StringToHash("y");
+        xHash = Animator.StringToHash(xParam);
+        yHash = Animator.StringToHash(yParam);
     }
 
     // Update is called once per frame
