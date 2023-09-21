@@ -5,7 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/driver-test.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 0
+    path: Assets/Scenes/passenger-pickup/passenger-pickup.unity
+    guid: ddd27d5e3d33cf64689e32a8f3ee1af2
+  - enabled: 1
+    path: Assets/Scenes/game-test.unity
+    guid: 8815f7bbe7a29aa4cb03c15ec5c0dc34
   m_configObjects: {}
