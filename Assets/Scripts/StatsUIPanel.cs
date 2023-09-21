@@ -9,6 +9,13 @@ using UnityEngine.UI;
 /// </summary>
 public class StatsUIPanel : MonoBehaviour
 {
+    public static StatsUIPanel instance;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     public TMP_Text timeText;
     public TMP_Text balanceText;
 

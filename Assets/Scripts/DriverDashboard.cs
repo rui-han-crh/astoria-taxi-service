@@ -9,6 +9,13 @@ using UnityEngine.UI;
 /// </summary>
 public class DriverDashboard : MonoBehaviour
 {
+    public static DriverDashboard instance;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     public TMP_Text destinationText;
     public TMP_Text fareText;
     public TMP_Text distanceText;
