@@ -5,27 +5,15 @@ using UnityEngine;
 
 public class FareComputationManager : MonoBehaviour
 {
-    // Where do i put the wallet system????
-    public WalletSystem walletSystem = new WalletSystem(1200);
+    public static FareComputationManager instance;
 
-    private const int fareFloor = 50;
+    private void Awake()
+    {
+        instance = this;
+    }
 
     private bool computingFare = false;
     private int fare;
-
-
-    private void Start()
-    {
-        StartFareComputatation(53);
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            EndFareComputation();
-        }
-    }
 
     public void StartFareComputatation(int baseFare)
     {
@@ -33,28 +21,44 @@ public class FareComputationManager : MonoBehaviour
         StartCoroutine(FareComputation(baseFare));
     }
 
+    // Not needed for now
+    /*
+    public void TerminateFareComputation()
+    {
+        computingFare = false;
+        StopCoroutine("FareComputation");
+        DriverDashboard.instance.UpdateFare(0);
+    }
+    */
+
     public void EndFareComputation()
     {
         computingFare = false;
     }
 
+    // Ticks every second to calculate the fare
     private IEnumerator FareComputation(int baseFare)
     {
+        TripState tripState = SaveManager.GetTripState();
+
         fare = baseFare;
         DriverDashboard.instance.UpdateFare(fare);
         while (computingFare)
         {
             yield return new WaitForSeconds(1);
-            if (fare > fareFloor)
+            
+            if (fare > tripState.FareFloor)
             {
                 fare--;
+                tripState.CurrentFareAmount = fare;
+                SaveManager.UpdateTripState(tripState);
                 DriverDashboard.instance.UpdateFare(fare);
+
             }
         }
         DriverDashboard.instance.UpdateFare(0);
 
-        // need to be changed after clarifying 
-        walletSystem.IncreaseBalance(fare);
-        StatsUIPanel.instance.UpdateBalance(walletSystem.GetBalance());
+        WalletSystem.Instance.IncreaseBalance(fare);
+        StatsUIPanel.instance.UpdateBalance(WalletSystem.Instance.GetBalance());
     }
 }

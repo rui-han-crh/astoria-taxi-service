@@ -125,6 +125,9 @@ public class TaxiPoint : MonoBehaviour
         // Perform actions when the passenger reaches the pick up position
         clientPoint.PassengerBehaviour.OnWalkDestinationReached += () =>
         {
+            // Start the fare counting
+            FareComputationManager.instance.StartFareComputatation(51);
+
             // Add the passenger to the taxi trip manager
             taxiTripManager.AddPassengerGameObject(clientPoint.PassengerBehaviour.gameObject);
 
@@ -154,6 +157,9 @@ public class TaxiPoint : MonoBehaviour
     {
         foreach (GameObject passengerGameObject in taxiTripManager.PassengerGameObjects)
         {
+            // Stop the fare counting
+            FareComputationManager.instance.EndFareComputation();
+
             // Reenable the visibility of the passenger game object
             passengerGameObject.SetActive(true);
 

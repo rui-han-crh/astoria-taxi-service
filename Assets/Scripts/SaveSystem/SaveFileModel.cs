@@ -9,6 +9,6 @@ public class SaveFileModel
     public SaveFileModel()
     {
         // Default trip state when no save file exists.
-        TripState = new TripState(new List<Passenger>(), null, 0, 0);
+        TripState = new TripState(new List<Passenger>(), null, 0, 50);
     }
 }

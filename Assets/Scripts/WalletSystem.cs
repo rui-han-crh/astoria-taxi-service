@@ -3,6 +3,17 @@
 /// </summary>
 public class WalletSystem
 {
+    private static WalletSystem instance;
+
+    public static WalletSystem Instance
+    {
+        get
+        {
+            instance ??= new WalletSystem();
+            return instance;
+        }
+    }
+
     private int currentBalance;
 
     /// <summary>
@@ -12,6 +23,7 @@ public class WalletSystem
     public WalletSystem(int initialBalance = 0)
     {
         currentBalance = initialBalance;
+        StatsUIPanel.instance.UpdateBalance(initialBalance);
     }
 
     /// <summary>
