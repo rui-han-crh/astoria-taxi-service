@@ -5,28 +5,11 @@ using UnityEngine.InputSystem;
 
 public class DriverDismountedBehaviour : MonoBehaviour
 {
-    private InputActions inputActions;
-
     private Vector2 direction;
 
     private const float speed = 1f;
 
     public Animator animator;
-
-    private void Awake()
-    {
-        inputActions = new InputActions();
-    }
-
-    public void OnEnable()
-    {
-        inputActions?.Enable();
-    }
-
-    public void OnDisable()
-    {
-        inputActions?.Disable();
-    }
 
     private void Update()
     {
