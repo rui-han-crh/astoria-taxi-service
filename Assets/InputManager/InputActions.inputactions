@@ -13,6 +13,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Mount/Dismount",
+                    "type": "Button",
+                    "id": "ecb4cbc7-caf0-4cf4-829e-de10016e92b6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -70,6 +79,17 @@
                     "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "51d74e84-5065-4263-a3f6-7ebd9db9a472",
+                    "path": "<Keyboard>/e",
+                    "interactions": "Hold(duration=2),Tap",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Mount/Dismount",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

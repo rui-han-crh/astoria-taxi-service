@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Interactions;
 
 public class MountDismountSystem : MonoBehaviour
 {
-    private const float eKeyHeldTime = 1f;
+    // Distance the player has to be from carriage in order to mount
     private const float mountRange = 1f;
 
     public Transform carriageTransform;
@@ -11,60 +13,65 @@ public class MountDismountSystem : MonoBehaviour
     public GameObject driverDashboardPanel;
 
     private bool mounted = true;
-    private float timeHeld = 0;
 
-    private void Update()
+    private InputActions inputActions;
+
+    private void Awake()
     {
-        if (mounted)
-        {
-            DismountCheck();
-        }
-        else
-        {
-            MountCheck();
-        }
-        
+        inputActions = new InputActions();
     }
 
-    private void DismountCheck()
+    public void OnEnable()
     {
-        if (Input.GetKey(KeyCode.E))
-        {
-            timeHeld += Time.deltaTime;
-            if(timeHeld > eKeyHeldTime)
-            {
-                timeHeld = 0;
-                mounted = false;
+        inputActions?.Enable();
+        inputActions.Driver.MountDismount.performed += (ctx) => MountDismountCheck(ctx);
+    }
 
-                // Dismount
-                playerDismountedTransform.gameObject.SetActive(true);
-                playerDismountedTransform.position = carriageTransform.position;
-                driverScript.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-                driverScript.enabled = false;
-                driverDashboardPanel.SetActive(false);
-            }
-        }
-        else
+    public void OnDisable()
+    {
+        inputActions?.Disable();
+    }
+
+
+    private void Start()
+    {
+        inputActions?.Enable();
+    }
+
+    private void MountDismountCheck(InputAction.CallbackContext context)
+    {
+        if (mounted && context.interaction is HoldInteraction)
         {
-            timeHeld = 0;
+            Dismount();
+        }
+        else if (!mounted && context.interaction is TapInteraction)
+        {
+            Mount();
         }
     }
 
-    private void MountCheck()
+    private void Dismount()
     {
-        if(Input.GetKeyDown(KeyCode.E))
-        {
-            // Checks for distance between carriage and player
-            if (Vector2.Distance(carriageTransform.position, 
-                playerDismountedTransform.position) <= mountRange)
-            {
-                mounted = true;
+        mounted = false;
 
-                // Mount
-                playerDismountedTransform.gameObject.SetActive(false);
-                driverScript.enabled = true;
-                driverDashboardPanel.SetActive(true);
-            }
+        playerDismountedTransform.gameObject.SetActive(true);
+        playerDismountedTransform.position = carriageTransform.position;
+        driverScript.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        driverScript.enabled = false;
+        driverDashboardPanel.SetActive(false);
+    }
+
+    private void Mount()
+    {
+        // Checks for distance between carriage and player
+        if (Vector2.Distance(carriageTransform.position,
+            playerDismountedTransform.position) <= mountRange)
+        {
+            mounted = true;
+
+            playerDismountedTransform.gameObject.SetActive(false);
+            driverScript.enabled = true;
+            driverDashboardPanel.SetActive(true);
         }
     }
 }
