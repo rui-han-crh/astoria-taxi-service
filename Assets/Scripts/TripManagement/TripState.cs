@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text.Json.Serialization;
 
+#nullable enable
 public class TripState
 {
     private List<Passenger> passengers;
 
-    private Vector2? destinationLocation;
+    private DestinationLocation? destinationLocation;
 
     private float currentFareAmount;
 
@@ -14,18 +16,21 @@ public class TripState
 
     public TripState(
         List<Passenger> passengers,
-        Vector2? destinationPoint,
+        DestinationLocation? destinationLocation,
+        TaxiPointLocation? taxiPointLocation,
         float currentFareAmount,
         float fareFloor)
     {
         this.passengers = passengers;
-        this.destinationLocation = destinationPoint;
+        this.destinationLocation = destinationLocation;
         this.currentFareAmount = currentFareAmount;
+        TaxiPointLocation = taxiPointLocation;
         this.fareFloor = fareFloor;
     }
 
     public List<Passenger> Passengers => passengers;
-    public Vector2? DestinationLocation => destinationLocation;
+
+    public DestinationLocation? DestinationLocation => destinationLocation;
 
     public float CurrentFareAmount
     {
@@ -35,7 +40,7 @@ public class TripState
 
     public float FareFloor => fareFloor;
 
-    public TaxiPoint TaxiPoint
+    public TaxiPointLocation? TaxiPointLocation
     {
         get; set;
     }
@@ -50,8 +55,37 @@ public class TripState
         passengers.Remove(passenger);
     }
 
-    public void SetDestinationPoint(Vector2 destinationLocation)
+    public void SetDestinationPoint(Vector2? destinationPoint)
     {
-        this.destinationLocation = destinationLocation;
+        if (destinationLocation == null)
+        {
+            destinationLocation = new DestinationLocation(destinationPoint);
+        } else
+        {
+            destinationLocation.SetDestinationPoint(destinationPoint);
+        }
+    }
+
+    public Vector2? GetDestinationPoint()
+    {
+        return destinationLocation?.DestinationPoint;
+    }
+
+    public void SetTaxiPoint(TaxiPoint taxiPoint)
+    {
+        TaxiPointLocation = new TaxiPointLocation(taxiPoint);
+    }
+
+    /// <summary>
+    /// Ends the current trip completely, and updates it.
+    /// </summary>
+    public void EndTrip()
+    {
+        passengers.Clear();
+        destinationLocation = null;
+        currentFareAmount = 0;
+        TaxiPointLocation = null;
+        SaveManager.UpdateTripState(this);
     }
 }
+#nullable disable
