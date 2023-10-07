@@ -66,7 +66,7 @@ public class TaxiPoint : MonoBehaviour
     public void ShowIndicator()
     {
         spriteRenderer.sprite = indicatorSprite;
-        
+
         spriteRenderer.sortingLayerName = "UI";
         spriteRenderer.enabled = true;
 
@@ -87,7 +87,15 @@ public class TaxiPoint : MonoBehaviour
 
         trigger.enabled = false;
         spriteRenderer.enabled = false;
+
+        // Determine if it is a destination point for an ongoing trip
+        if (SaveManager.GetTripState()?.TaxiPointLocation != null && 
+            SaveManager.GetTripState().TaxiPointLocation.isSameTaxiPoint(this))
+        {
+            ShowDropOffIndicator();
+        }
     }
+
 
     public virtual void Update()
     {
@@ -179,6 +187,9 @@ public class TaxiPoint : MonoBehaviour
 
             // Remove the passenger from the taxi trip manager
             taxiTripManager.RemovePassengerGameObject(passengerBehaviour.gameObject);
+
+            // Remove the trip from TripState
+            SaveManager.GetTripState().EndTrip();
         }
     }
 }

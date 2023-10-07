@@ -32,11 +32,7 @@ public class TaxiTripManager : MonoBehaviour
 
     private static void CacheTaxiPoints()
     {
-        if (taxiPointMap != null)
-        {
-            return;
-        }
-
+        // Need to recache taxi points when scene changes.
         taxiPointMap = new Dictionary<Vector2, TaxiPoint>();
 
         foreach (TaxiPoint taxiPoint in FindObjectsOfType<TaxiPoint>())
@@ -71,7 +67,7 @@ public class TaxiTripManager : MonoBehaviour
 
     private void LoadTaxiPoint()
     {
-        Vector2? destinationLocation = SaveManager.GetTripState().DestinationLocation;
+        Vector2? destinationLocation = SaveManager.GetTripState().GetDestinationPoint();
 
         if (destinationLocation != null)
         {
@@ -125,16 +121,29 @@ public class TaxiTripManager : MonoBehaviour
     public void SetDropOffLocation(TaxiPoint dropOffLocation)
     {
         this.dropOffLocation = dropOffLocation;
+        TripState tripState = SaveManager.GetTripState();
+        tripState.SetTaxiPoint(dropOffLocation);
+        SaveManager.UpdateTripState(tripState);
     }
 
     public void AddPassengerGameObject(GameObject passengerGameObject)
     {
         passengerGameObjects.Add(passengerGameObject);
+
+        // Update trip state
+        TripState tripState = SaveManager.GetTripState();
+        tripState.Passengers.Add(passengerGameObject.GetComponent<PassengerBehaviour>().Passenger);
+        SaveManager.UpdateTripState(tripState);
     }
 
     public void RemovePassengerGameObject(GameObject passengerGameObject)
     {
         passengerGameObjects.Remove(passengerGameObject);
+
+        // Update trip state
+        TripState tripState = SaveManager.GetTripState();
+        tripState.Passengers.Remove(passengerGameObject.GetComponent<PassengerBehaviour>().Passenger);
+        SaveManager.UpdateTripState(tripState);
     }
 
     /**
@@ -151,6 +160,11 @@ public class TaxiTripManager : MonoBehaviour
         TaxiPoint randomTaxiPoint = GetTaxiPoint(choices[randomIndex]);
 
         SetDropOffLocation(randomTaxiPoint);
+
+        // Update trip state
+        TripState tripState = SaveManager.GetTripState();
+        tripState.SetDestinationPoint(choices[randomIndex]);
+        SaveManager.UpdateTripState(tripState);
 
         return randomTaxiPoint;
     }

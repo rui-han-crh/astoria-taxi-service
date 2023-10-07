@@ -6,6 +6,13 @@ public class SaveManager
 {
     public static readonly string SAVE_FILE_PATH = Application.persistentDataPath + "/save.json";
 
+    // To allow serialization of Vector2.
+    private static readonly JsonSerializerOptions options = new JsonSerializerOptions
+    {
+        Converters = { new Vector2Converter() },
+        //ReferenceHandler = ReferenceHandler.Preserve,
+    };
+
     private static SaveManager instance;
 
     public static SaveManager Instance
@@ -29,7 +36,7 @@ public class SaveManager
         } else
         {
             // Load save file
-            saveFileModel = JsonSerializer.Deserialize<SaveFileModel>(File.ReadAllText(SAVE_FILE_PATH));
+            saveFileModel = JsonSerializer.Deserialize<SaveFileModel>(File.ReadAllText(SAVE_FILE_PATH), options);
         }
     }
 
@@ -43,8 +50,19 @@ public class SaveManager
         Instance.saveFileModel.TripState = tripState;
     }
 
+    public static SceneState GetSceneState()
+    {
+        return Instance.saveFileModel.SceneState;
+    }
+
+    public static void UpdateSceneState(SceneState sceneState)
+    {
+        Instance.saveFileModel.SceneState = sceneState;
+    }
+
     public static void Save()
     {
-        File.WriteAllText(SAVE_FILE_PATH, JsonSerializer.Serialize(Instance.saveFileModel));
+        Debug.Log(JsonSerializer.Serialize(Instance.saveFileModel, options));
+        File.WriteAllText(SAVE_FILE_PATH, JsonSerializer.Serialize(Instance.saveFileModel, options));
     }
 }
