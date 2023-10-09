@@ -14,4 +14,9 @@ public class Passenger
         Name = name;
         ResourceFileReference = resourceFileReference;
     }
+
+    public Passenger()
+    {
+
+    }
 }

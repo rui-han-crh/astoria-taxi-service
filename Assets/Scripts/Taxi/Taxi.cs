@@ -8,7 +8,7 @@ using UnityEngine;
 /// </summary>
 public class Taxi : MonoBehaviour
 {
-    private HailTaxiBehaviour passenger;
+    private PassengerBehaviour passenger;
 
     private TaxiTripManager manager;
 
@@ -37,17 +37,17 @@ public class Taxi : MonoBehaviour
     /// </summary>
     /// <param name="hailTaxiBehaviour"> The passenger to board. </param>
     /// <exception cref="Exception"> If the passenger is not the current passenger approaching. </exception>
-    public void Board(HailTaxiBehaviour hailTaxiBehaviour)
+    public void Board(PassengerBehaviour hailTaxiBehaviour)
     {
         if (passenger != hailTaxiBehaviour)
         {
             throw new Exception("Cannot board a passenger that is not the current passenger approaching.");
         }
 
-        manager.BeginRide(100);
+        manager.BeginRide(passenger);
     }
 
-    public void CancelHail(HailTaxiBehaviour hailTaxiBehaviour)
+    public void CancelHail(PassengerBehaviour hailTaxiBehaviour)
     {
         if (passenger == hailTaxiBehaviour)
         {
@@ -62,7 +62,7 @@ public class Taxi : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Passenger"))
         {
-            passenger = collision.transform.parent.GetComponent<HailTaxiBehaviour>();
+            passenger = collision.transform.parent.GetComponent<PassengerBehaviour>();
             passenger.SwitchToApproachState();
         }
     }

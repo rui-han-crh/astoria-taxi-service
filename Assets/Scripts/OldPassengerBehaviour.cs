@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavmeshAgentMovement))]
-public class PassengerBehaviour : MonoBehaviour
+public class OldPassengerBehaviour : MonoBehaviour
 {
     private Vector3 initialPosition;
 

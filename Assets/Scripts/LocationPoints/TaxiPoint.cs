@@ -174,8 +174,8 @@ public class TaxiPoint : MonoBehaviour
             // Move the passenger to the carriage body
             passengerGameObject.transform.position = taxiTripManager.CarriageBody.position;
 
-            PassengerBehaviour passengerBehaviour = passengerGameObject
-                .GetComponent<PassengerBehaviour>();
+            OldPassengerBehaviour passengerBehaviour = passengerGameObject
+                .GetComponent<OldPassengerBehaviour>();
 
             passengerBehaviour.OnWalkDestinationReached += () =>
             {

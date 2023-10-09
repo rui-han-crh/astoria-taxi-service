@@ -21,6 +21,8 @@ public class TaxiTripManager : MonoBehaviour
 
     public List<GameObject> PassengerGameObjects => passengerGameObjects.ToList();
 
+    private TripState tripState;
+
     private void Awake()
     {
         CacheTaxiPoints();
@@ -28,6 +30,11 @@ public class TaxiTripManager : MonoBehaviour
         LoadPassengers();
 
         LoadTaxiPoint();
+    }
+
+    public void BeginRide()
+    {
+        tripState = new TripState(TripState.State.InProgress, dropOffLocation, passengerGameObjects.ToList());
     }
 
     private static void CacheTaxiPoints()
@@ -55,7 +62,7 @@ public class TaxiTripManager : MonoBehaviour
             GameObject passengerGameObject = Instantiate(passengerPrefab, carriageBody);
 
             // Set the passenger data into the PassengerBehaviour component.
-            passengerGameObject.GetComponent<PassengerBehaviour>().SetPassenger(passenger);
+            passengerGameObject.GetComponent<OldPassengerBehaviour>().SetPassenger(passenger);
 
             // Disable the passenger object. (On board, so not visible)
             passengerGameObject.SetActive(false);
@@ -132,7 +139,7 @@ public class TaxiTripManager : MonoBehaviour
 
         // Update trip state
         TripState tripState = SaveManager.GetTripState();
-        tripState.Passengers.Add(passengerGameObject.GetComponent<PassengerBehaviour>().Passenger);
+        tripState.Passengers.Add(passengerGameObject.GetComponent<OldPassengerBehaviour>().Passenger);
         SaveManager.UpdateTripState(tripState);
     }
 
@@ -142,7 +149,7 @@ public class TaxiTripManager : MonoBehaviour
 
         // Update trip state
         TripState tripState = SaveManager.GetTripState();
-        tripState.Passengers.Remove(passengerGameObject.GetComponent<PassengerBehaviour>().Passenger);
+        tripState.Passengers.Remove(passengerGameObject.GetComponent<OldPassengerBehaviour>().Passenger);
         SaveManager.UpdateTripState(tripState);
     }
 

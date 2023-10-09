@@ -10,11 +10,11 @@ public class ClientPoint : MonoBehaviour
     [SerializeField]
     private TaxiPoint taxiPoint;
 
-    private PassengerBehaviour passengerBehaviour;
+    private OldPassengerBehaviour passengerBehaviour;
 
     public TaxiPoint TaxiPoint => taxiPoint;
 
-    public PassengerBehaviour PassengerBehaviour => passengerBehaviour;
+    public OldPassengerBehaviour PassengerBehaviour => passengerBehaviour;
 
     private void Awake()
     {
@@ -30,7 +30,7 @@ public class ClientPoint : MonoBehaviour
 
         GameObject client = Instantiate(randomClientPrefab, transform.position, Quaternion.identity);
 
-        passengerBehaviour = client.GetComponent<PassengerBehaviour>();
+        passengerBehaviour = client.GetComponent<OldPassengerBehaviour>();
 
         Passenger currentPassenger = new Passenger("Amanda", $"{CLIENTS_FOLDER}/{randomClientPrefab.name}");
         passengerBehaviour.SetPassenger(currentPassenger);

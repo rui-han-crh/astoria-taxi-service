@@ -6,11 +6,14 @@ using UnityEngine;
 ///<summary>
 /// Hails the player taxi with a certain probability every few seconds.
 ///</summary>
-public class HailTaxiBehaviour : MonoBehaviour
+public class PassengerBehaviour : MonoBehaviour
 {
+    private static GameObject[] CLIENT_OBJECTS;
     private static readonly float TAXI_PASSENGER_DISTANCE_THRESHOLD = 10f;
     private static readonly float APPROACH_THRESHOLD = 0.1f;
     private static readonly float PROBABILITY = 0.1f;
+
+    private readonly Passenger passenger = new Passenger();
 
     public PassengerState state;
 
@@ -26,6 +29,8 @@ public class HailTaxiBehaviour : MonoBehaviour
 
     private void Awake()
     {
+        CLIENT_OBJECTS ??= Resources.LoadAll<GameObject>("Clients");
+
         taxi = GameObject.FindGameObjectWithTag("Player").GetComponent<Taxi>();
         npcRoamBehaviour = GetComponent<NpcRoamBehaviour>();
         navmeshAgentMovement = GetComponent<NavmeshAgentMovement>();
