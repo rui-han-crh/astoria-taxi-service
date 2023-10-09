@@ -8,28 +8,33 @@ using UnityEngine;
 /// </summary>
 public class Taxi : MonoBehaviour
 {
-    private PassengerBehaviour passenger;
+    private PassengerBehaviour passengerBehaviour;
 
     private TaxiTripManager manager;
 
     private void Awake()
     {
         manager = GetComponent<TaxiTripManager>();
+
+        if (manager == null)
+        {
+            throw new Exception("Taxi must have a TaxiTripManager component.");
+        }
     }
 
     public bool Hail()
     {
-        return passenger != null;
+        return passengerBehaviour != null;
     }
 
     public bool HasPassengerApproaching()
     {
-        return passenger != null;
+        return passengerBehaviour != null;
     }
 
     public bool HasPassenger()
     {
-        return passenger != null && passenger.state == PassengerState.Boarded;
+        return passengerBehaviour != null && passengerBehaviour.state == PassengerState.Boarded;
     }
 
     /// <summary>
@@ -39,19 +44,19 @@ public class Taxi : MonoBehaviour
     /// <exception cref="Exception"> If the passenger is not the current passenger approaching. </exception>
     public void Board(PassengerBehaviour hailTaxiBehaviour)
     {
-        if (passenger != hailTaxiBehaviour)
+        if (passengerBehaviour != hailTaxiBehaviour)
         {
             throw new Exception("Cannot board a passenger that is not the current passenger approaching.");
         }
 
-        manager.BeginRide(passenger);
+        manager.BeginRide(passengerBehaviour.Passenger);
     }
 
     public void CancelHail(PassengerBehaviour hailTaxiBehaviour)
     {
-        if (passenger == hailTaxiBehaviour)
+        if (passengerBehaviour == hailTaxiBehaviour)
         {
-            passenger = null;
+            passengerBehaviour = null;
         }
     }
 
@@ -62,8 +67,8 @@ public class Taxi : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Passenger"))
         {
-            passenger = collision.transform.parent.GetComponent<PassengerBehaviour>();
-            passenger.SwitchToApproachState();
+            passengerBehaviour = collision.transform.parent.GetComponent<PassengerBehaviour>();
+            passengerBehaviour.SwitchToApproachState();
         }
     }
 }

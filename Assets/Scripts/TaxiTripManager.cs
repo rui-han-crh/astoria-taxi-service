@@ -32,9 +32,14 @@ public class TaxiTripManager : MonoBehaviour
         LoadTaxiPoint();
     }
 
-    public void BeginRide()
+    public void BeginRide(Passenger passenger)
     {
-        tripState = new TripState(TripState.State.InProgress, dropOffLocation, passengerGameObjects.ToList());
+        if (tripState != null)
+        {
+            throw new System.Exception("Cannot begin a ride when a ride is already in progress.");
+        }
+
+        Debug.Log($"Beginning ride with {passenger.Name}");
     }
 
     private static void CacheTaxiPoints()
@@ -128,7 +133,7 @@ public class TaxiTripManager : MonoBehaviour
     public void SetDropOffLocation(TaxiPoint dropOffLocation)
     {
         this.dropOffLocation = dropOffLocation;
-        TripState tripState = SaveManager.GetTripState();
+        OldTripState tripState = SaveManager.GetTripState();
         tripState.SetTaxiPoint(dropOffLocation);
         SaveManager.UpdateTripState(tripState);
     }
@@ -138,7 +143,7 @@ public class TaxiTripManager : MonoBehaviour
         passengerGameObjects.Add(passengerGameObject);
 
         // Update trip state
-        TripState tripState = SaveManager.GetTripState();
+        OldTripState tripState = SaveManager.GetTripState();
         tripState.Passengers.Add(passengerGameObject.GetComponent<OldPassengerBehaviour>().Passenger);
         SaveManager.UpdateTripState(tripState);
     }
@@ -148,7 +153,7 @@ public class TaxiTripManager : MonoBehaviour
         passengerGameObjects.Remove(passengerGameObject);
 
         // Update trip state
-        TripState tripState = SaveManager.GetTripState();
+        OldTripState tripState = SaveManager.GetTripState();
         tripState.Passengers.Remove(passengerGameObject.GetComponent<OldPassengerBehaviour>().Passenger);
         SaveManager.UpdateTripState(tripState);
     }
@@ -169,7 +174,7 @@ public class TaxiTripManager : MonoBehaviour
         SetDropOffLocation(randomTaxiPoint);
 
         // Update trip state
-        TripState tripState = SaveManager.GetTripState();
+        OldTripState tripState = SaveManager.GetTripState();
         tripState.SetDestinationPoint(choices[randomIndex]);
         SaveManager.UpdateTripState(tripState);
 

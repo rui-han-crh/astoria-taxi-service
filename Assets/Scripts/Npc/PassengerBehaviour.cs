@@ -4,16 +4,34 @@ using UnityEditor;
 using UnityEngine;
 
 ///<summary>
-/// Hails the player taxi with a certain probability every few seconds.
+/// Dictates the passenger behaviour at any point in time.
+/// 
+/// The passenger may either be wandering, hailing a taxi, or approaching a taxi.
+/// 
+/// The passenger will always wander for a random amount of time, then either hail a taxi or continue wandering.
+/// 
+/// The chance of hailing a taxi is determined by the PROBABILITY constant.
+/// 
+/// If the passenger hails a taxi, they will wait for a random amount of time, if the taxi does not enter the
+/// radius of the passenger during this time, the passenger will cancel the hail and continue wandering.
+/// 
+/// Otherwise, if the taxi does enter the radius of the passenger, the passenger will approach the taxi.
+/// 
+/// At this point, if the taxi continues to move away from the passenger, the passenger will cancel the hail and
+/// go back to wandering.
+/// 
+/// Note that if one passenger is already approaching the taxi, other passengers will cease to hail the taxi, until
+/// that passenger has either boarded the taxi or cancelled the hail.
 ///</summary>
 public class PassengerBehaviour : MonoBehaviour
 {
-    private static GameObject[] CLIENT_OBJECTS;
     private static readonly float TAXI_PASSENGER_DISTANCE_THRESHOLD = 10f;
     private static readonly float APPROACH_THRESHOLD = 0.1f;
     private static readonly float PROBABILITY = 0.1f;
 
-    private readonly Passenger passenger = new Passenger();
+    private Passenger passenger;
+
+    public Passenger Passenger => passenger;
 
     public PassengerState state;
 
@@ -29,16 +47,15 @@ public class PassengerBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        CLIENT_OBJECTS ??= Resources.LoadAll<GameObject>("Clients");
-
         taxi = GameObject.FindGameObjectWithTag("Player").GetComponent<Taxi>();
         npcRoamBehaviour = GetComponent<NpcRoamBehaviour>();
         navmeshAgentMovement = GetComponent<NavmeshAgentMovement>();
 
         greenCircle.SetActive(false);
+
+        passenger = new Passenger(name, $"Clients/{name}");
     }
 
-    // Update is called once per frame
     private void Update()
     {
         switch (state)

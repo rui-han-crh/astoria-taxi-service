@@ -17,6 +17,16 @@ public class Passenger
 
     public Passenger()
     {
+        Name = "Default Passenger";
+        ResourceFileReference = "Clients/Default Passenger";
+    }
 
+    public static Passenger GetRandomPassenger()
+    {
+        GameObject[] clients = ResourceManager.Instance.LoadAll<GameObject>("Clients");
+
+        int randomIndex = Random.Range(0, clients.Length);
+
+        return new Passenger(clients[randomIndex].name, "Clients/" + clients[randomIndex].name);
     }
 }

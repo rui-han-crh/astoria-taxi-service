@@ -40,12 +40,12 @@ public class SaveManager
         }
     }
 
-    public static TripState GetTripState()
+    public static OldTripState GetTripState()
     {
         return Instance.saveFileModel.TripState;
     }
 
-    public static void UpdateTripState(TripState tripState)
+    public static void UpdateTripState(OldTripState tripState)
     {
         Instance.saveFileModel.TripState = tripState;
     }

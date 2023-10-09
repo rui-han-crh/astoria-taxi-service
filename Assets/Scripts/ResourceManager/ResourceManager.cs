@@ -36,67 +36,96 @@ public class ResourceManager : MonoBehaviour
         Debug.LogWarning("You tried to instantiate a second ResourceManager. Only one is allowed.");
     }
 
-    public GameObject[] LoadAll<T>(string path) where T : Object
+    /// <summary>
+    /// Returns all the resources at the given path from the cache.
+    /// 
+    /// If the path is a folder, returns all the resources in that folder.
+    /// 
+    /// This method will cache the resources in the dictionary if they are not already cached.
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public T[] LoadAll<T>(string path) where T : Object
     {
         string[] splitPath = path.Split('/');
-
-        Resources.LoadAll<T>(path)
-            .ToList()
-            .ForEach(resource => AddResource(splitPath, resource));
 
         try 
         {
             return ((Dictionary<string, object>)GetNestedValue(splitPath)).Values
-                .Where(value => value is GameObject)
-                .Select(value => (GameObject)value)
+                .Select(value => (T)value)
                 .ToArray();
         }
         catch (System.Exception)
         {
-            throw new System.Exception($"No resource found at path {path}");
+            T[] lazyLoad = Resources.LoadAll<T>(path);
+
+            foreach (T resource in lazyLoad)
+            {
+                AddResource(splitPath.Concat(new string[] { resource.name }).ToArray(), resource);
+            }
+
+            return lazyLoad;
         }
     }
 
-    public GameObject Load<T>(string path) where T : Object
+    /// <summary>
+    /// Loads the resource at the given path from the cache.
+    /// 
+    /// This is synonymous with Resources.Load<T>(path), except that it will
+    /// cache the resource in the dictionary if it is not already cached.
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public T Load<T>(string path) where T : Object
     {
         string[] splitPath = path.Split('/');
 
-        var resource = Resources.Load<T>(path);
-
-        AddResource(splitPath, resource);
-
         try
         {
-            return (GameObject)GetNestedValue(splitPath);
+            print("Finding in cache");
+            return (T)GetNestedValue(splitPath);
         }
         catch (System.Exception)
         {
-            throw new System.Exception($"No resource found at path {path}");
+            print("Not in cache, loading from resources");
+            T resource = Resources.Load<T>(path);
+            print(resources.Count);
+            AddResource(splitPath, resource);
+            return resource;
         }
     }
 
     private void AddResource(string[] keys, object resource)
     {
         var current = Instance.resources;
+        print("The split path is " + string.Join(" ", keys));
 
         // We exclude the last key because that is the name of the resource.
         // Every prior key maps string => Dictionary<string, object> representing a folder.
         // The last key maps the string to the resource itself.
         for (int i = 0; i < keys.Length - 1; i++)
         {
+            print(keys[i]);
             if (!current.ContainsKey(keys[i]))
             {
+                print("Adding key " + keys[i] + "mapped to a new dictionary");
                 current[keys[i]] = new Dictionary<string, object>();
             }
 
             current = (Dictionary<string, object>)current[keys[i]];
         }
 
+        print("Adding key " + keys.Last() + " mapped to " + resource);
         current[keys.Last()] = resource;
     }
 
     private static object GetNestedValue(params string[] keys)
     {
+        print(string.Join("/", keys));
         if (keys.Length == 0)
         {
             throw new System.Exception("No keys provided");
@@ -108,8 +137,11 @@ public class ResourceManager : MonoBehaviour
         {
             if (!current.ContainsKey(key))
             {
+                print("No resource found at path " + string.Join("/", keys));
                 throw new System.Exception($"No resource found at path {string.Join("/", keys)}");
             }
+
+            print("Found key: " + key);
 
             current = (Dictionary<string, object>)current[key];
         }

@@ -20,7 +20,6 @@ public class GenerateNpc : MonoBehaviour
 {
     private static readonly string PLAYER_TAG = "Player";
     private static readonly string PEDESTRIAN_AREA_STRING = "Pavement";
-    private static readonly string NPC_RESOURCE_PATH = "Clients/townfolk-f";
 
     private Transform playerTransform;
 
@@ -77,8 +76,12 @@ public class GenerateNpc : MonoBehaviour
             // Get the closest point on the NavMesh to the random point
             Vector3 closestPoint = GetClosestPointOnNavMesh(10, randomPoint);
 
+            Passenger passenger = Passenger.GetRandomPassenger();
+
+            GameObject passengerPrefab = ResourceManager.Instance.Load<GameObject>(passenger.ResourceFileReference);
+
             // Instantiate the NPC
-            Instantiate(Resources.Load(NPC_RESOURCE_PATH), closestPoint, Quaternion.identity);
+            Instantiate(passengerPrefab, closestPoint, Quaternion.identity);
         }
     }
 

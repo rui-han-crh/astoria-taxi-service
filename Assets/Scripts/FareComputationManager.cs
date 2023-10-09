@@ -39,7 +39,7 @@ public class FareComputationManager : MonoBehaviour
     // Ticks every second to calculate the fare
     private IEnumerator FareComputation(int baseFare)
     {
-        TripState tripState = SaveManager.GetTripState();
+        OldTripState tripState = SaveManager.GetTripState();
 
         fare = baseFare;
         DriverDashboard.instance.UpdateFare(fare);
