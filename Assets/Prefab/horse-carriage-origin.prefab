@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2073437482995783176}
   m_Layer: 0
   m_Name: horse1-sprite
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 2073437483198063356}
   m_Layer: 0
   m_Name: carriage-sprite
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -289,7 +289,7 @@ GameObject:
   - component: {fileID: 2073437483941653096}
   m_Layer: 0
   m_Name: horse2-sprite
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -420,9 +420,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5492699595595093998}
+  - component: {fileID: 503887861}
   m_Layer: 0
   m_Name: horse-carriage-origin
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -436,7 +437,7 @@ Transform:
   m_GameObject: {fileID: 3547187163280205902}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.764683, y: 3.0837061, z: -9.967737}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2073437482995783178}
@@ -446,6 +447,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &503887861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3547187163280205902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6de5decc5d9059f47a237848f43c4d48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  carriageBody: {fileID: 2073437483985351324}
+  activePickUpIndicators: []
 --- !u!1001 &6763343449264627026
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -453,6 +468,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5492699595595093998}
     m_Modifications:
+    - target: {fileID: 4691182285520101591, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 4691182287307354060, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 4691182287428408997, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 4691182287428408998, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
+      propertyPath: movementSpeed
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 4691182287428408998, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
+      propertyPath: rotationSpeed
+      value: 80
+      objectReference: {fileID: 0}
     - target: {fileID: 6223137107731998002, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -500,6 +535,10 @@ PrefabInstance:
     - target: {fileID: 7011560768791035373, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
       propertyPath: m_Name
       value: horse-carriage-controller
+      objectReference: {fileID: 0}
+    - target: {fileID: 7011560768791035373, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}

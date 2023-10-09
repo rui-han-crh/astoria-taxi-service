@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(NavmeshAgentMovement))]
 public class PassengerBehaviour : MonoBehaviour
@@ -38,9 +39,9 @@ public class PassengerBehaviour : MonoBehaviour
 
     public void WalkToPickUpPosition(Transform pickUpTransform)
     {
-        navmeshAgentMovement.SetDestination(pickUpTransform);
+        navmeshAgentMovement.SetDestination(pickUpTransform.position);
 
-        void InvokePickUpReachedAndUnsubscribe()
+        void InvokePickUpReachedAndUnsubscribe(NavMeshAgent agent)
         {
             OnWalkDestinationReached?.Invoke();
             navmeshAgentMovement.OnDestinationReached -= InvokePickUpReachedAndUnsubscribe;
@@ -49,7 +50,7 @@ public class PassengerBehaviour : MonoBehaviour
 
         float initialDistance = Vector2.Distance(initialPosition, pickUpTransform.position);
 
-        StartCoroutine(LimitWalkDistance(InvokePickUpReachedAndUnsubscribe, initialDistance, pickUpTransform));
+        //StartCoroutine(LimitWalkDistance(InvokePickUpReachedAndUnsubscribe, initialDistance, pickUpTransform));
 
         navmeshAgentMovement.OnDestinationReached += InvokePickUpReachedAndUnsubscribe;
     }
@@ -67,7 +68,7 @@ public class PassengerBehaviour : MonoBehaviour
             {
                 navmeshAgentMovement.SetDestination(initialPosition);
 
-                navmeshAgentMovement.OnDestinationReached -= onDestinationReached;
+                //navmeshAgentMovement.OnDestinationReached -= onDestinationReached;
                 OnWalkDestinationReached = null;
 
                 OnPickUpFailed?.Invoke();
@@ -83,14 +84,14 @@ public class PassengerBehaviour : MonoBehaviour
 
     public void WalkToClientPoint(ClientPoint clientPoint)
     {
-        navmeshAgentMovement.SetDestination(clientPoint.transform);
+        navmeshAgentMovement.SetDestination(clientPoint.transform.position);
 
         void InvokeDestinationReachedAndUnsubscribe()
         {
             OnWalkDestinationReached?.Invoke();
-            navmeshAgentMovement.OnDestinationReached -= InvokeDestinationReachedAndUnsubscribe;
+            //navmeshAgentMovement.OnDestinationReached -= InvokeDestinationReachedAndUnsubscribe;
         }
 
-        navmeshAgentMovement.OnDestinationReached += InvokeDestinationReachedAndUnsubscribe;
+        //navmeshAgentMovement.OnDestinationReached += InvokeDestinationReachedAndUnsubscribe;
     }
 }
