@@ -1,26 +1,26 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
 public class DriverBehavior : MonoBehaviour
 {
     private InputActions inputActions;
-    /**
-        * Represents intended destination to orient the vehicle towards.
-        */
+    /// <summary>
+    /// Represents the destination vector of the vehicle.
+    /// </summary>
     private Vector2 destinationVector;
     private Quaternion destinationRotation;
 
-    private Rigidbody2D rb;
+    private Rigidbody2D horseRb;
+    private Rigidbody2D carriageRb;
 
-    /**
-        * Represents the speed at which the vehicle rotates.
-        */
+    /// <summary>
+    /// Represents the speed at which the vehicle rotates.
+    /// </summary>
     [SerializeField, Tooltip("Speed in degrees per second")]
     private float rotationSpeed = 30f;
 
-    /**
-        * Represents the speed at which the vehicle moves.
-        */
+    /// <summary>
+    /// Represents the speed at which the vehicle moves.
+    /// </summary>
     [SerializeField, Tooltip("Speed in units per second")]
     private float movementSpeed = 100f;
 
@@ -43,7 +43,8 @@ public class DriverBehavior : MonoBehaviour
         inputActions.Driver.Movement.performed += ctx => TriggerMovement(ctx.ReadValue<Vector2>());
         inputActions.Driver.Movement.canceled += ctx => isMoving = false;
 
-        rb = GetComponent<Rigidbody2D>();
+        horseRb = GetComponent<Rigidbody2D>();
+        carriageRb = carriageBody.GetComponent<Rigidbody2D>();
     }
 
     public void OnEnable()
@@ -62,6 +63,8 @@ public class DriverBehavior : MonoBehaviour
         isMoving = true;
         destinationVector = movement;
         destinationRotation = Quaternion.LookRotation(Vector3.forward, destinationVector);
+
+        Debug.DrawLine(transform.position, transform.position + (Vector3)destinationVector, Color.red, 1f);
     }
 
     private void FixedUpdate()
@@ -69,7 +72,7 @@ public class DriverBehavior : MonoBehaviour
         if (!isMoving)
         {
             // If not moving, stop moving.
-            rb.velocity = Vector2.zero;
+            horseRb.velocity = Vector2.zero;
             return;
         }
 
@@ -82,10 +85,16 @@ public class DriverBehavior : MonoBehaviour
         {
             float step = rotationSpeed * Time.fixedDeltaTime;
 
-            transform.rotation = Quaternion.RotateTowards(
-                transform.rotation,
-                destinationRotation,
-                step);
+            Quaternion rotation = Quaternion.RotateTowards(transform.rotation, destinationRotation, step);
+
+            // Rotate around the pivot point towards the destination rotation.
+            Vector3 pivot = transform.position - transform.up;
+
+            Debug.DrawLine(transform.position, pivot, Color.blue, 0.01f);
+
+            transform.RotateAround(pivot, Vector3.forward, rotation.eulerAngles.z - transform.rotation.eulerAngles.z);
+
+            Debug.DrawLine(transform.position, transform.position + (Vector3)transform.up, Color.green, 0.01f);
 
             float ratio = Quaternion.Angle(transform.rotation, destinationRotation) / 180f;
 
@@ -93,6 +102,6 @@ public class DriverBehavior : MonoBehaviour
         }
 
         // Move in the direction of the destination vector.
-        rb.velocity = transform.up * scaledMovementSpeed;
+        horseRb.velocity = transform.up * scaledMovementSpeed;
     }
 }

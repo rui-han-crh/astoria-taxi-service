@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class TaxiTripManager : MonoBehaviour
 {
@@ -11,35 +12,26 @@ public class TaxiTripManager : MonoBehaviour
     [SerializeField]
     private Transform carriageBody;
 
-    private TaxiPoint dropOffLocation;
+    private House destinationHouse;
 
-    private HashSet<GameObject> passengerGameObjects = new HashSet<GameObject>();
-
-    public List<TaxiPoint> activePickUpIndicators = new List<TaxiPoint>();
-
-    public Transform CarriageBody => carriageBody;
-
-    public List<GameObject> PassengerGameObjects => passengerGameObjects.ToList();
+    private Taxi taxi;
 
     private TripState tripState;
 
+    private House[] houseGameObjects;
+
+    private const NavMeshAreas roadArea = NavMeshAreas.Road;
+
     private void Awake()
     {
+        taxi = GetComponent<Taxi>();
+
         CacheTaxiPoints();
 
         LoadPassengers();
 
-        LoadTaxiPoint();
-    }
-
-    public void BeginRide(Passenger passenger)
-    {
-        if (tripState != null)
-        {
-            throw new System.Exception("Cannot begin a ride when a ride is already in progress.");
-        }
-
-        Debug.Log($"Beginning ride with {passenger.Name}");
+        houseGameObjects = GameObject.FindGameObjectsWithTag("House")
+            .Select(house => house.GetComponent<House>()).ToArray();
     }
 
     private static void CacheTaxiPoints()
@@ -73,139 +65,50 @@ public class TaxiTripManager : MonoBehaviour
             passengerGameObject.SetActive(false);
 
             // Add the passenger to the list of passenger game objects.
-            passengerGameObjects.Add(passengerGameObject);
+            //passengerGameObjects.Add(passengerGameObject);
         }
     }
 
-    private void LoadTaxiPoint()
+    public void BeginRide(Passenger passenger)
     {
-        Vector2? destinationLocation = SaveManager.GetTripState().GetDestinationPoint();
-
-        if (destinationLocation != null)
+        if (tripState != null)
         {
-            SetDropOffLocation(GetTaxiPoint(destinationLocation.Value));
-        }
-    }
-
-    private TaxiPoint GetTaxiPoint(Vector2 position)
-    {
-        if (!taxiPointMap.TryGetValue(position, out TaxiPoint taxiPoint))
-        {
-            Debug.LogError($"No taxi point found at position {position}, did you move a taxi point recently?");
+            throw new System.Exception("Cannot begin a ride when a ride is already in progress.");
         }
 
-        return taxiPoint;
-    }
-    /**
-     * Shows the pickup indicator for any taxi point within a 30 meter radius of the taxi.
-     */
-    private void RandomizePickUpChoice()
-    {
-        foreach (TaxiPoint taxiPoint in taxiPointMap.Values)
-        {
-            if (taxiPoint.IsPickUp)
-            {
-                // Taxi point already active as pick-up point.
-                return;
-            }
+        FareComputationManager.Instance.StartFareComputatation(500, 10, 2);
 
-            if (Vector2.Distance(taxiPoint.transform.position, carriageBody.transform.position) < 30f)
-            {
-                if (Random.Range(0, 100) < 20)
-                {
-                    taxiPoint.ShowPickUpIndicator();
-
-                    activePickUpIndicators.Add(taxiPoint);
-
-                    taxiPoint.onDisablePickUpIndicator += () =>
-                    {
-                        activePickUpIndicators.Remove(taxiPoint);
-                    };
-
-                    taxiPoint.SetIsPickUp(true);
-                    taxiPoint.ClientPoint.SpawnPotentialClient();
-                }
-            }
-        }
+        destinationHouse = houseGameObjects[Random.Range(0, houseGameObjects.Length)];
+        SetDropOffLocation();
     }
 
-
-    public void SetDropOffLocation(TaxiPoint dropOffLocation)
+    private void SetDropOffLocation()
     {
-        this.dropOffLocation = dropOffLocation;
-        OldTripState tripState = SaveManager.GetTripState();
-        tripState.SetTaxiPoint(dropOffLocation);
-        SaveManager.UpdateTripState(tripState);
+        // Create a drop off indicator at the house.
+        CreateDropOffIndicator(destinationHouse.DoorTransform.position);
     }
 
-    public void AddPassengerGameObject(GameObject passengerGameObject)
+    private static void CreateDropOffIndicator(Vector2 dropOffLocation)
     {
-        passengerGameObjects.Add(passengerGameObject);
+        GameObject dropOffIndicatorPrefab = ResourceManager.Instance.Load<GameObject>("DropOffIndicator");
 
-        // Update trip state
-        OldTripState tripState = SaveManager.GetTripState();
-        tripState.Passengers.Add(passengerGameObject.GetComponent<OldPassengerBehaviour>().Passenger);
-        SaveManager.UpdateTripState(tripState);
+        // Find the closest point on the navmesh road area to the drop off location.
+        NavMesh.SamplePosition(dropOffLocation, out NavMeshHit hit, 30f, (AreaMask)roadArea);
+
+        // Instantiate the drop off indicator at the closest point on the navmesh.
+        Instantiate(dropOffIndicatorPrefab, hit.position, Quaternion.identity);
     }
 
-    public void RemovePassengerGameObject(GameObject passengerGameObject)
+    public void DropOff()
     {
-        passengerGameObjects.Remove(passengerGameObject);
+        FareComputationManager.Instance.EndFareComputation();
 
-        // Update trip state
-        OldTripState tripState = SaveManager.GetTripState();
-        tripState.Passengers.Remove(passengerGameObject.GetComponent<OldPassengerBehaviour>().Passenger);
-        SaveManager.UpdateTripState(tripState);
-    }
+        taxi.DropOffPassenger(destinationHouse.DoorTransform.position);
 
-    /**
-     * Chooses a random destination for the taxi, apart from the pick up point.
-     */
-    public TaxiPoint ChooseRandomDestination(Vector2 pickUpPosition)
-    {
-        Vector2[] choices = taxiPointMap.Keys
-            .Where(taxiPoint => taxiPoint != pickUpPosition)
-            .ToArray();
+        // Reset the drop off location.
+        destinationHouse = null;
 
-        int randomIndex = Random.Range(0, choices.Count());
-
-        TaxiPoint randomTaxiPoint = GetTaxiPoint(choices[randomIndex]);
-
-        SetDropOffLocation(randomTaxiPoint);
-
-        // Update trip state
-        OldTripState tripState = SaveManager.GetTripState();
-        tripState.SetDestinationPoint(choices[randomIndex]);
-        SaveManager.UpdateTripState(tripState);
-
-        return randomTaxiPoint;
-    }
-
-    public void DisablePickUpIndicators()
-    {
-        activePickUpIndicators
-            .ForEach(activePickUpIndicator => {
-                activePickUpIndicator.HideIndicator();
-                activePickUpIndicator.SetIsPickUp(false);
-            });   
-
-        activePickUpIndicators.Clear();
-    }
-
-    private float timeLeftToNextRandomPickUpChoice = 0f;
-
-    public void Update()
-    {
-        print($"Number of passengers: {passengerGameObjects.Count}");
-        if (passengerGameObjects.Count == 0)
-        {
-            timeLeftToNextRandomPickUpChoice -= Time.deltaTime;
-
-            if (timeLeftToNextRandomPickUpChoice <= 0f)
-            {
-                timeLeftToNextRandomPickUpChoice = 3f;
-                RandomizePickUpChoice();
-            }
-        }
+        // Reset the trip state.
+        tripState = null;
     }
 }

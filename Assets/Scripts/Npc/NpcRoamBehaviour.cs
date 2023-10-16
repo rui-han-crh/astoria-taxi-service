@@ -35,9 +35,10 @@ public class NpcRoamBehaviour : MonoBehaviour
         // Set the cost of moving through each area
         foreach (NavMeshAreas area in walkableAreas)
         {
+            // If the area is the usual walking area, set the cost to something high
             if ((navMeshAreas & area) == 0)
             {
-                navmeshAgentMovement.SetAreaCost((int)area, 1000000000);
+                navmeshAgentMovement.SetAreaCost((int)area, 50);
             }
         }
     }

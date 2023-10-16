@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2073437482995783173}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.2, y: 0.55, z: 0}
+  m_LocalPosition: {x: -0.2, y: 0.63, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pinnedParent: {fileID: 2073437483863133173}
-  rotatePerDegrees: 90
+  rotatePerDegrees: 45
 --- !u!1 &2073437483198063353
 GameObject:
   m_ObjectHideFlags: 0
@@ -165,7 +165,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2073437483198063353}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.04, y: -0.66, z: 9.967737}
+  m_LocalPosition: {x: 0.04, y: -0.6, z: 9.967737}
   m_LocalScale: {x: 1.4, y: 1.4, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -302,7 +302,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2073437483941653093}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.2, y: 0.55, z: 0}
+  m_LocalPosition: {x: 0.2, y: 0.6300001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -410,7 +410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pinnedParent: {fileID: 2073437483863133173}
-  rotatePerDegrees: 90
+  rotatePerDegrees: 45
 --- !u!1 &3547187163280205902
 GameObject:
   m_ObjectHideFlags: 0
@@ -460,7 +460,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   carriageBody: {fileID: 2073437483985351324}
-  activePickUpIndicators: []
 --- !u!1001 &6763343449264627026
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -468,25 +467,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5492699595595093998}
     m_Modifications:
-    - target: {fileID: 4691182285520101591, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_TagString
-      value: Untagged
+    - target: {fileID: 1216310257095148565, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
+      propertyPath: m_ConnectedAnchor.y
+      value: -1
       objectReference: {fileID: 0}
-    - target: {fileID: 4691182287307354060, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_TagString
-      value: Untagged
+    - target: {fileID: 2542709715456426447, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4691182287428408997, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_TagString
-      value: Untagged
-      objectReference: {fileID: 0}
-    - target: {fileID: 4691182287428408998, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: movementSpeed
-      value: 150
-      objectReference: {fileID: 0}
-    - target: {fileID: 4691182287428408998, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: rotationSpeed
-      value: 80
+    - target: {fileID: 4691182287307354064, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6223137107731998002, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
       propertyPath: m_RootOrder
@@ -537,8 +528,8 @@ PrefabInstance:
       value: horse-carriage-controller
       objectReference: {fileID: 0}
     - target: {fileID: 7011560768791035373, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}
-      propertyPath: m_TagString
-      value: Untagged
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eb4a58e92f7b1f847810a62be16a268d, type: 3}

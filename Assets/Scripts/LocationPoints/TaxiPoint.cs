@@ -134,17 +134,17 @@ public class TaxiPoint : MonoBehaviour
         clientPoint.PassengerBehaviour.OnWalkDestinationReached += () =>
         {
             // Start the fare counting
-            FareComputationManager.instance.StartFareComputatation(51);
+            //FareComputationManager.Instance.StartFareComputatation(51);
 
             // Add the passenger to the taxi trip manager
-            taxiTripManager.AddPassengerGameObject(clientPoint.PassengerBehaviour.gameObject);
+            //taxiTripManager.AddPassengerGameObject(clientPoint.PassengerBehaviour.gameObject);
 
             // All active pick up indicators should be hidden
-            taxiTripManager.DisablePickUpIndicators();
+            //taxiTripManager.DisablePickUpIndicators();
 
-            TaxiPoint dropOffPoint = taxiTripManager.ChooseRandomDestination(transform.position);
+            //TaxiPoint dropOffPoint = taxiTripManager.ChooseRandomDestination(transform.position);
 
-            dropOffPoint.ShowDropOffIndicator();
+            //dropOffPoint.ShowDropOffIndicator();
 
             // Disable the visibility of the passenger game object
             clientPoint.PassengerBehaviour.gameObject.SetActive(false);
@@ -158,21 +158,21 @@ public class TaxiPoint : MonoBehaviour
             disableIndicatorCoroutine = StartCoroutine(DisableIndicator());
         };
 
-        clientPoint.PassengerBehaviour.WalkToPickUpPosition(taxiTripManager.CarriageBody);
+        //clientPoint.PassengerBehaviour.WalkToPickUpPosition(taxiTripManager.CarriageBody);
     }
 
     private void PerformDropOffEvents(TaxiTripManager taxiTripManager)
     {
-        foreach (GameObject passengerGameObject in taxiTripManager.PassengerGameObjects)
+        foreach (GameObject passengerGameObject in new List<GameObject>()) //taxiTripManager.PassengerGameObjects)
         {
             // Stop the fare counting
-            FareComputationManager.instance.EndFareComputation();
+            FareComputationManager.Instance.EndFareComputation();
 
             // Reenable the visibility of the passenger game object
             passengerGameObject.SetActive(true);
 
             // Move the passenger to the carriage body
-            passengerGameObject.transform.position = taxiTripManager.CarriageBody.position;
+            //passengerGameObject.transform.position = taxiTripManager.CarriageBody.position;
 
             OldPassengerBehaviour passengerBehaviour = passengerGameObject
                 .GetComponent<OldPassengerBehaviour>();
@@ -186,7 +186,7 @@ public class TaxiPoint : MonoBehaviour
             passengerBehaviour.WalkToClientPoint(clientPoint);
 
             // Remove the passenger from the taxi trip manager
-            taxiTripManager.RemovePassengerGameObject(passengerBehaviour.gameObject);
+            //taxiTripManager.RemovePassengerGameObject(passengerBehaviour.gameObject);
 
             // Remove the trip from TripState
             SaveManager.GetTripState().EndTrip();

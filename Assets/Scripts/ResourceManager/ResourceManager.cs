@@ -87,7 +87,8 @@ public class ResourceManager : MonoBehaviour
         try
         {
             print("Finding in cache");
-            return (T)GetNestedValue(splitPath);
+            T foundValue = (T)GetNestedValue(splitPath);
+            return foundValue;
         }
         catch (System.Exception)
         {
@@ -119,7 +120,7 @@ public class ResourceManager : MonoBehaviour
             current = (Dictionary<string, object>)current[keys[i]];
         }
 
-        print("Adding key " + keys.Last() + " mapped to " + resource);
+        print("Adding key " + keys.Last() + " mapped to " + resource.ToString());
         current[keys.Last()] = resource;
     }
 
@@ -133,19 +134,19 @@ public class ResourceManager : MonoBehaviour
 
         var current = Instance.resources;
 
-        foreach (var key in keys)
+        for (int i = 0; i < keys.Length - 1; i++)
         {
-            if (!current.ContainsKey(key))
+            if (!current.ContainsKey(keys[i]))
             {
                 print("No resource found at path " + string.Join("/", keys));
                 throw new System.Exception($"No resource found at path {string.Join("/", keys)}");
             }
 
-            print("Found key: " + key);
+            print("Found key: " + keys[i]);
 
-            current = (Dictionary<string, object>)current[key];
+            current = (Dictionary<string, object>)current[keys[i]];
         }
 
-        return current;
+        return current[keys.Last()];
     }
 }

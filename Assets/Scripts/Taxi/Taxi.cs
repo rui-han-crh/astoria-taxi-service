@@ -5,10 +5,17 @@ using UnityEngine;
 
 /// <summary>
 /// Represents the player taxi.
+/// 
+/// This class stores the current target passenger (regardless of whether they are on board or approaching),
+/// and a reference to the trip manager to keeps track of the destination.
+/// 
+/// If a save is present, this class will consume the save file to restore the state of the taxi.
 /// </summary>
 public class Taxi : MonoBehaviour
 {
-    private PassengerBehaviour passengerBehaviour;
+    [SerializeField]
+    private PassengerBehaviour passengerBehaviour; 
+    // If there is no passenger approaching, this will be null.
 
     private TaxiTripManager manager;
 
@@ -50,6 +57,22 @@ public class Taxi : MonoBehaviour
         }
 
         manager.BeginRide(passengerBehaviour.Passenger);
+    }
+
+    /// <summary>
+    /// Drops off the current passenger on board the taxi.
+    /// 
+    /// This will first reactivate the passenger's game object, then make the passenger path to
+    /// the house's door.
+    /// </summary>
+    /// <param name="passengerPathTarget"> The target position for the passenger to path to. </param>
+    public void DropOffPassenger(Vector3 passengerPathTarget)
+    {
+        passengerBehaviour.gameObject.SetActive(true);
+
+        passengerBehaviour.transform.parent = null;
+
+        passengerBehaviour.SwitchToDropOffState(passengerPathTarget);
     }
 
     public void CancelHail(PassengerBehaviour hailTaxiBehaviour)

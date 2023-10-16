@@ -134,6 +134,18 @@ public class PassengerBehaviour : MonoBehaviour
         state = PassengerState.Approaching;
     }
 
+    /// <summary>
+    /// Switches the passenger to the drop off state and causes the passenger to path to the house.
+    /// 
+    /// Once the passenger reaches the house, the passenger will despawn.
+    /// </summary>
+    /// <param name="targetDestination"></param>
+    public void SwitchToDropOffState(Vector3 targetDestination)
+    {
+        navmeshAgentMovement.SetDestination(targetDestination);
+        navmeshAgentMovement.OnDestinationReached += (_) => Destroy(gameObject);
+    }
+
     private void HailTaxi()
     {
         if (taxi.Hail())

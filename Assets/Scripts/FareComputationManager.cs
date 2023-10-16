@@ -5,20 +5,37 @@ using UnityEngine;
 
 public class FareComputationManager : MonoBehaviour
 {
-    public static FareComputationManager instance;
+    private static FareComputationManager instance;
+    public static FareComputationManager Instance { get => instance;}
 
     private void Awake()
     {
+        if (instance != null)
+        {
+            Debug.LogError("More than one FareComputationManager in the scene.");
+            Destroy(this);
+            return;
+        }
+
         instance = this;
     }
 
-    private bool computingFare = false;
-    private int fare;
+    private bool isComputingFare = false;
+    private int currentFare;
+    private int fareFloor;
+    private int decrementAmount;
 
-    public void StartFareComputatation(int baseFare)
+    /// <summary>
+    /// Begins the fare computation.
+    /// </summary>
+    /// <param name="startingFare"> The fare amount to start with, decreasing per second. </param>
+    public void StartFareComputatation(int startingFare, int fareFloor, int decrementAmount = 1)
     {
-        computingFare = true;
-        StartCoroutine(FareComputation(baseFare));
+        isComputingFare = true;
+        this.fareFloor = fareFloor;
+        this.decrementAmount = decrementAmount;
+
+        StartCoroutine(ComputeFare(startingFare));
     }
 
     // Not needed for now
@@ -31,34 +48,42 @@ public class FareComputationManager : MonoBehaviour
     }
     */
 
+    /// <summary>
+    /// Ends the fare computation and adds the fare to the wallet.
+    /// </summary>
     public void EndFareComputation()
     {
-        computingFare = false;
+        isComputingFare = false;
+
+        // The process of adding the fare to the wallet is done in the coroutine.
     }
 
     // Ticks every second to calculate the fare
-    private IEnumerator FareComputation(int baseFare)
+    private IEnumerator ComputeFare(int baseFare)
     {
-        OldTripState tripState = SaveManager.GetTripState();
+        // We should not try to retrieve from save file. The data is kept locally until there is a need to save.
 
-        fare = baseFare;
-        DriverDashboard.instance.UpdateFare(fare);
-        while (computingFare)
+        //OldTripState tripState = SaveManager.GetTripState();
+
+        currentFare = baseFare;
+        DriverDashboard.instance.UpdateFare(currentFare);
+        while (isComputingFare)
         {
             yield return new WaitForSeconds(1);
             
-            if (fare > tripState.FareFloor)
+            if (currentFare > fareFloor)
             {
-                fare--;
-                tripState.CurrentFareAmount = fare;
-                SaveManager.UpdateTripState(tripState);
-                DriverDashboard.instance.UpdateFare(fare);
+                currentFare = Mathf.Max(currentFare - decrementAmount, fareFloor);
+                //SaveManager.UpdateTripState(tripState);
+                DriverDashboard.instance.UpdateFare(currentFare);
 
             }
         }
+
+        // End of fare computation, add the fare to the wallet
         DriverDashboard.instance.UpdateFare(0);
 
-        WalletSystem.Instance.IncreaseBalance(fare);
+        WalletSystem.Instance.IncreaseBalance(currentFare);
         StatsUIPanel.instance.UpdateBalance(WalletSystem.Instance.GetBalance());
     }
 }

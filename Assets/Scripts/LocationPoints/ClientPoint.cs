@@ -8,11 +8,11 @@ public class ClientPoint : MonoBehaviour
     private static readonly string CLIENTS_FOLDER = "Clients";
 
     [SerializeField]
-    private TaxiPoint taxiPoint;
+    //private TaxiPoint taxiPoint;
 
     private OldPassengerBehaviour passengerBehaviour;
 
-    public TaxiPoint TaxiPoint => taxiPoint;
+    //public TaxiPoint TaxiPoint => taxiPoint;
 
     public OldPassengerBehaviour PassengerBehaviour => passengerBehaviour;
 

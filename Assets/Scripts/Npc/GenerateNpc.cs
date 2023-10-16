@@ -52,7 +52,7 @@ public class GenerateNpc : MonoBehaviour
         if (timeToNextGeneration <= 0f)
         {
             // Generate some number of NPCs
-            int numberOfNpcs = Random.Range(1, 4);
+            int numberOfNpcs = Random.Range(1, 6);
 
             Generate(numberOfNpcs);
 

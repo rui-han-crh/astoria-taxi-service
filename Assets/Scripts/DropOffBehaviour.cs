@@ -2,10 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DropOffBehaviour : TaxiPoint
+public class DropOffBehaviour : MonoBehaviour
 {
-    void Start()
+    private static readonly string PLAYER_TAG = "Player";
+    public void OnTriggerEnter2D(Collider2D collision)
     {
-        ShowDropOffIndicator();
+        if (collision.gameObject.CompareTag(PLAYER_TAG))
+        {
+            collision.gameObject.GetComponent<TaxiTripManager>().DropOff();
+
+            Destroy(gameObject);
+        }
     }
 }
