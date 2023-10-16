@@ -1,12 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using System.Text.Json.Serialization;
 using UnityEngine;
 
-public class Passenger
+[Serializable]
+public readonly struct Passenger
 {
     public string Name { get; }
     public string ResourceFileReference { get; }
 
+    [JsonConstructor]
     public Passenger(
         string name,
         string resourceFileReference)
@@ -15,17 +17,11 @@ public class Passenger
         ResourceFileReference = resourceFileReference;
     }
 
-    public Passenger()
-    {
-        Name = "Default Passenger";
-        ResourceFileReference = "Clients/Default Passenger";
-    }
-
     public static Passenger GetRandomPassenger()
     {
         GameObject[] clients = ResourceManager.Instance.LoadAll<GameObject>("Clients");
 
-        int randomIndex = Random.Range(0, clients.Length);
+        int randomIndex = UnityEngine.Random.Range(0, clients.Length);
 
         return new Passenger(clients[randomIndex].name, "Clients/" + clients[randomIndex].name);
     }

@@ -24,8 +24,8 @@ public class DriverDismountedBehaviour : MonoBehaviour
     {
         inputActions?.Enable();
 
-        inputActions.Driver.Movement.performed += ctx => TriggerMovement(ctx.ReadValue<Vector2>());
-        inputActions.Driver.Movement.canceled += ctx => isMoving = false;
+        inputActions.Player.Movement.performed += ctx => TriggerMovement(ctx.ReadValue<Vector2>());
+        inputActions.Player.Movement.canceled += ctx => isMoving = false;
     }
 
     public void OnEnable()

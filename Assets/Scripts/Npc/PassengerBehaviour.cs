@@ -4,24 +4,24 @@ using UnityEditor;
 using UnityEngine;
 
 ///<summary>
-/// Dictates the passenger behaviour at any point in time.
+/// <para>Dictates the passenger behaviour at any point in time.</para>
 /// 
-/// The passenger may either be wandering, hailing a taxi, or approaching a taxi.
+/// <para>The passenger may either be wandering, hailing a taxi, or approaching a taxi.</para>
 /// 
-/// The passenger will always wander for a random amount of time, then either hail a taxi or continue wandering.
+/// <para>The passenger will always wander for a random amount of time, then either hail a taxi or continue wandering.</para>
 /// 
-/// The chance of hailing a taxi is determined by the PROBABILITY constant.
+/// <para>The chance of hailing a taxi is determined by the PROBABILITY constant.</para>
 /// 
-/// If the passenger hails a taxi, they will wait for a random amount of time, if the taxi does not enter the
-/// radius of the passenger during this time, the passenger will cancel the hail and continue wandering.
+/// <para>If the passenger hails a taxi, they will wait for a random amount of time, if the taxi does not enter the
+/// radius of the passenger during this time, the passenger will cancel the hail and continue wandering.</para>
 /// 
-/// Otherwise, if the taxi does enter the radius of the passenger, the passenger will approach the taxi.
+/// <para>Otherwise, if the taxi does enter the radius of the passenger, the passenger will approach the taxi.</para>
 /// 
-/// At this point, if the taxi continues to move away from the passenger, the passenger will cancel the hail and
-/// go back to wandering.
+/// <para>At this point, if the taxi continues to move away from the passenger, the passenger will cancel the hail and
+/// go back to wandering.</para>
 /// 
-/// Note that if one passenger is already approaching the taxi, other passengers will cease to hail the taxi, until
-/// that passenger has either boarded the taxi or cancelled the hail.
+/// <para>Note that if one passenger is already approaching the taxi, other passengers will cease to hail the taxi, until
+/// that passenger has either boarded the taxi or cancelled the hail.</para>
 ///</summary>
 public class PassengerBehaviour : MonoBehaviour
 {
@@ -53,7 +53,31 @@ public class PassengerBehaviour : MonoBehaviour
 
         greenCircle.SetActive(false);
 
-        passenger = new Passenger(name, $"Clients/{name}");
+        passenger = new Passenger(name, $"Clients/Default-Passenger");
+    }
+
+    public static PassengerBehaviour CreateFromSaveFile()
+    {
+        PassengerBehaviourModel passengerBehaviourModel = SaveManager.LoadPassengerBehaviourModel();
+
+        string reference = passengerBehaviourModel.Passenger.ResourceFileReference;
+
+        print($"Constructing passenger from reference: {reference}");
+
+        GameObject passengerGameObject = ResourceManager.Instance.Load<GameObject>(reference);
+
+        PassengerBehaviour passengerBehaviour = passengerGameObject.GetComponent<PassengerBehaviour>();
+
+        passengerBehaviour.passenger = passengerBehaviourModel.Passenger;
+        passengerBehaviour.state = passengerBehaviourModel.PassengerState;
+        passengerBehaviour.timeLeftInState = passengerBehaviourModel.TimeLeftInState;
+
+        return passengerBehaviour;
+    }
+
+    public PassengerBehaviourModel ToPassengerBehaviourModel()
+    {
+        return new PassengerBehaviourModel(passenger, state, timeLeftInState);
     }
 
     private void Update()
@@ -113,11 +137,11 @@ public class PassengerBehaviour : MonoBehaviour
 
     public void SwitchToHailState()
     {
-        npcRoamBehaviour.enabled = false;
         navmeshAgentMovement.StopMoving();
         HailTaxi();
         state = PassengerState.Hailing;
         timeLeftInState = 10f;
+        npcRoamBehaviour.enabled = false;
     }
 
     public void SwitchToWanderState()

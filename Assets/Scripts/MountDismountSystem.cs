@@ -24,7 +24,7 @@ public class MountDismountSystem : MonoBehaviour
     public void OnEnable()
     {
         inputActions?.Enable();
-        inputActions.Driver.MountDismount.performed += (ctx) => MountDismountCheck(ctx);
+        inputActions.Player.MountDismount.performed += (ctx) => MountDismountCheck(ctx);
     }
 
     public void OnDisable()

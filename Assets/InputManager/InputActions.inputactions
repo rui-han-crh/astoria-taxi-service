@@ -2,7 +2,7 @@
     "name": "InputActions",
     "maps": [
         {
-            "name": "Driver",
+            "name": "Player",
             "id": "052e0a0c-6bd6-4a85-a37e-206f8105ec35",
             "actions": [
                 {
@@ -18,6 +18,15 @@
                     "name": "Mount/Dismount",
                     "type": "Button",
                     "id": "ecb4cbc7-caf0-4cf4-829e-de10016e92b6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Save",
+                    "type": "Button",
+                    "id": "8a452696-b76c-4ca1-9234-f197de5af88b",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -88,6 +97,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Mount/Dismount",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2fce6a65-bf17-4a48-94c4-0da4af0ac686",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Save",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -24,7 +24,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     ""name"": ""InputActions"",
     ""maps"": [
         {
-            ""name"": ""Driver"",
+            ""name"": ""Player"",
             ""id"": ""052e0a0c-6bd6-4a85-a37e-206f8105ec35"",
             ""actions"": [
                 {
@@ -40,6 +40,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""name"": ""Mount/Dismount"",
                     ""type"": ""Button"",
                     ""id"": ""ecb4cbc7-caf0-4cf4-829e-de10016e92b6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Save"",
+                    ""type"": ""Button"",
+                    ""id"": ""8a452696-b76c-4ca1-9234-f197de5af88b"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -112,6 +121,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Mount/Dismount"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2fce6a65-bf17-4a48-94c4-0da4af0ac686"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Save"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -135,10 +155,11 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         }
     ]
 }");
-        // Driver
-        m_Driver = asset.FindActionMap("Driver", throwIfNotFound: true);
-        m_Driver_Movement = m_Driver.FindAction("Movement", throwIfNotFound: true);
-        m_Driver_MountDismount = m_Driver.FindAction("Mount/Dismount", throwIfNotFound: true);
+        // Player
+        m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
+        m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
+        m_Player_MountDismount = m_Player.FindAction("Mount/Dismount", throwIfNotFound: true);
+        m_Player_Save = m_Player.FindAction("Save", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -197,35 +218,40 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // Driver
-    private readonly InputActionMap m_Driver;
-    private List<IDriverActions> m_DriverActionsCallbackInterfaces = new List<IDriverActions>();
-    private readonly InputAction m_Driver_Movement;
-    private readonly InputAction m_Driver_MountDismount;
-    public struct DriverActions
+    // Player
+    private readonly InputActionMap m_Player;
+    private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
+    private readonly InputAction m_Player_Movement;
+    private readonly InputAction m_Player_MountDismount;
+    private readonly InputAction m_Player_Save;
+    public struct PlayerActions
     {
         private @InputActions m_Wrapper;
-        public DriverActions(@InputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Movement => m_Wrapper.m_Driver_Movement;
-        public InputAction @MountDismount => m_Wrapper.m_Driver_MountDismount;
-        public InputActionMap Get() { return m_Wrapper.m_Driver; }
+        public PlayerActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Movement => m_Wrapper.m_Player_Movement;
+        public InputAction @MountDismount => m_Wrapper.m_Player_MountDismount;
+        public InputAction @Save => m_Wrapper.m_Player_Save;
+        public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(DriverActions set) { return set.Get(); }
-        public void AddCallbacks(IDriverActions instance)
+        public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
+        public void AddCallbacks(IPlayerActions instance)
         {
-            if (instance == null || m_Wrapper.m_DriverActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_DriverActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_PlayerActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerActionsCallbackInterfaces.Add(instance);
             @Movement.started += instance.OnMovement;
             @Movement.performed += instance.OnMovement;
             @Movement.canceled += instance.OnMovement;
             @MountDismount.started += instance.OnMountDismount;
             @MountDismount.performed += instance.OnMountDismount;
             @MountDismount.canceled += instance.OnMountDismount;
+            @Save.started += instance.OnSave;
+            @Save.performed += instance.OnSave;
+            @Save.canceled += instance.OnSave;
         }
 
-        private void UnregisterCallbacks(IDriverActions instance)
+        private void UnregisterCallbacks(IPlayerActions instance)
         {
             @Movement.started -= instance.OnMovement;
             @Movement.performed -= instance.OnMovement;
@@ -233,23 +259,26 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @MountDismount.started -= instance.OnMountDismount;
             @MountDismount.performed -= instance.OnMountDismount;
             @MountDismount.canceled -= instance.OnMountDismount;
+            @Save.started -= instance.OnSave;
+            @Save.performed -= instance.OnSave;
+            @Save.canceled -= instance.OnSave;
         }
 
-        public void RemoveCallbacks(IDriverActions instance)
+        public void RemoveCallbacks(IPlayerActions instance)
         {
-            if (m_Wrapper.m_DriverActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_PlayerActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IDriverActions instance)
+        public void SetCallbacks(IPlayerActions instance)
         {
-            foreach (var item in m_Wrapper.m_DriverActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_PlayerActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_DriverActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_PlayerActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
-    public DriverActions @Driver => new DriverActions(this);
+    public PlayerActions @Player => new PlayerActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -259,9 +288,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             return asset.controlSchemes[m_KeyboardMouseSchemeIndex];
         }
     }
-    public interface IDriverActions
+    public interface IPlayerActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnMountDismount(InputAction.CallbackContext context);
+        void OnSave(InputAction.CallbackContext context);
     }
 }

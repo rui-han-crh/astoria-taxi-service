@@ -113,8 +113,8 @@ public class TaxiPoint : MonoBehaviour
             HideIndicator();
 
             // Find the carriage body transform
-            TaxiTripManager taxiTripManager = collision.transform.root
-                .GetComponentInChildren<TaxiTripManager>();
+            TripManager taxiTripManager = collision.transform.root
+                .GetComponentInChildren<TripManager>();
 
             if (isPickUp)
             {
@@ -126,7 +126,7 @@ public class TaxiPoint : MonoBehaviour
         }
     }
 
-    private void PerformPickUpEvents(TaxiTripManager taxiTripManager)
+    private void PerformPickUpEvents(TripManager taxiTripManager)
     {
         StopCoroutine(disableIndicatorCoroutine);
 
@@ -161,12 +161,12 @@ public class TaxiPoint : MonoBehaviour
         //clientPoint.PassengerBehaviour.WalkToPickUpPosition(taxiTripManager.CarriageBody);
     }
 
-    private void PerformDropOffEvents(TaxiTripManager taxiTripManager)
+    private void PerformDropOffEvents(TripManager taxiTripManager)
     {
         foreach (GameObject passengerGameObject in new List<GameObject>()) //taxiTripManager.PassengerGameObjects)
         {
             // Stop the fare counting
-            FareComputationManager.Instance.EndFareComputation();
+            FareManager.Instance.EndFareComputation();
 
             // Reenable the visibility of the passenger game object
             passengerGameObject.SetActive(true);

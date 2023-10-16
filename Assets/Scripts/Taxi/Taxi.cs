@@ -11,22 +11,27 @@ using UnityEngine;
 /// 
 /// If a save is present, this class will consume the save file to restore the state of the taxi.
 /// </summary>
-public class Taxi : MonoBehaviour
+public class Taxi : MonoBehaviour, ISaveable<TaxiModel>
 {
     [SerializeField]
     private PassengerBehaviour passengerBehaviour; 
     // If there is no passenger approaching, this will be null.
 
-    private TaxiTripManager manager;
+    private TripManager manager;
 
     private void Awake()
     {
-        manager = GetComponent<TaxiTripManager>();
-
-        if (manager == null)
+        if (!TryGetComponent(out manager))
         {
             throw new Exception("Taxi must have a TaxiTripManager component.");
         }
+
+        SaveManager.Instance.OnSaveRequested += Save;
+    }
+
+    private void Start()
+    {
+        RestoreStateFromModel();
     }
 
     public bool Hail()
@@ -56,7 +61,7 @@ public class Taxi : MonoBehaviour
             throw new Exception("Cannot board a passenger that is not the current passenger approaching.");
         }
 
-        manager.BeginRide(passengerBehaviour.Passenger);
+        manager.BeginRide();
     }
 
     /// <summary>
@@ -92,6 +97,33 @@ public class Taxi : MonoBehaviour
         {
             passengerBehaviour = collision.transform.parent.GetComponent<PassengerBehaviour>();
             passengerBehaviour.SwitchToApproachState();
+        }
+    }
+
+    public TaxiModel ToModel()
+    {
+        return new TaxiModel(HasPassenger());
+    }
+
+    public void RestoreStateFromModel()
+    {
+        TaxiModel taxiModel = SaveManager.LoadTaxiModel();
+
+        print(taxiModel.HasPassenger);
+
+        if (taxiModel.HasPassenger)
+        {
+            passengerBehaviour = PassengerBehaviour.CreateFromSaveFile();
+        }
+    }
+
+    public void Save(bool writeImmediately = true)
+    {
+        SaveManager.SaveTaxi(this, writeImmediately);
+
+        if (passengerBehaviour != null)
+        {
+            SaveManager.SavePassengerBehaviour(passengerBehaviour, writeImmediately);
         }
     }
 }

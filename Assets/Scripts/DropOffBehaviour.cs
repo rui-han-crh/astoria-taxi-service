@@ -9,7 +9,7 @@ public class DropOffBehaviour : MonoBehaviour
     {
         if (collision.gameObject.CompareTag(PLAYER_TAG))
         {
-            collision.gameObject.GetComponent<TaxiTripManager>().DropOff();
+            collision.gameObject.GetComponent<TripManager>().DropOff();
 
             Destroy(gameObject);
         }

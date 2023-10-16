@@ -27,7 +27,7 @@ public class SceneExit : MonoBehaviour
         // Update and save
         SceneState sceneState = new SceneState(otherSceneEntryPoint, otherSceneName);
         SaveManager.UpdateSceneState(sceneState);
-        SaveManager.Save();
+        SaveManager.WriteToDisk();
 
         // Transition to other scene
         SceneLoader.LoadScene(otherSceneName);
