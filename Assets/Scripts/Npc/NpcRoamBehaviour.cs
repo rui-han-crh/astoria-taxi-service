@@ -14,9 +14,6 @@ public class NpcRoamBehaviour : MonoBehaviour
     [SerializeField]
     private NavMeshAreas navMeshAreas;
 
-    [SerializeField]
-    private int[] areaCosts = new int[32];
-
     private NavmeshAgentMovement navmeshAgentMovement;
 
     private void Awake()

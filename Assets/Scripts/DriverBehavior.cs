@@ -1,74 +1,82 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using DG.Tweening.Core;
+using System;
+using System.Collections;
+using UnityEngine;
 
-public class DriverBehavior : MonoBehaviour
+/// <summary>
+/// This class represents the behavior of the driver.
+/// 
+/// TODO: Make this class prettier, it's a mess.
+/// </summary>
+public abstract class DriverBehavior : MonoBehaviour
 {
-    private InputActions inputActions;
     /// <summary>
     /// Represents the destination vector of the vehicle.
     /// </summary>
-    private Vector2 destinationVector;
-    private Quaternion destinationRotation;
+    protected Vector2 destinationVector;
+    protected Quaternion destinationRotation;
 
-    private Rigidbody2D horseRb;
-    private Rigidbody2D carriageRb;
+    protected Rigidbody2D horseRb;
 
     /// <summary>
     /// Represents the speed at which the vehicle rotates.
     /// </summary>
     [SerializeField, Tooltip("Speed in degrees per second")]
-    private float rotationSpeed = 30f;
+    protected float rotationSpeed = 30f;
 
     /// <summary>
     /// Represents the speed at which the vehicle moves.
     /// </summary>
     [SerializeField, Tooltip("Speed in units per second")]
-    private float movementSpeed = 100f;
+    protected float movementSpeed = 100f;
 
     [SerializeField]
-    private GameObject carriageBody;
+    protected GameObject carriageBody;
 
     public GameObject CarriageBody => carriageBody;
 
-    private bool isMoving = false;
+    protected bool isMoving = false;
+    protected bool isReversing = false;
+    protected bool isRotating = false;
 
-    private void Awake()
+    public delegate void MovementStarted(float movementSpeed);
+    public event MovementStarted OnMovementStarted;
+    public event Action OnMovementStopped;
+
+    protected virtual void Start()
     {
-        inputActions = new InputActions();
+        if (!TryGetComponent(out horseRb))
+        {
+            Debug.LogError("Driver must have a Rigidbody2D component.");
+        }
     }
 
-    private void Start()
-    {
-        inputActions?.Enable();
-
-        inputActions.Player.Movement.performed += ctx => TriggerMovement(ctx.ReadValue<Vector2>());
-        inputActions.Player.Movement.canceled += ctx => isMoving = false;
-
-        horseRb = GetComponent<Rigidbody2D>();
-        carriageRb = carriageBody.GetComponent<Rigidbody2D>();
-    }
-
-    public void OnEnable()
-    {
-        inputActions?.Enable();
-    }
-
-    public void OnDisable()
-    {
-        inputActions?.Disable();
-    }
-
-    private void TriggerMovement(Vector2 movement)
+    protected void TriggerMovement(Vector2 movement)
     {
         // Signal to begin movement.
         isMoving = true;
         destinationVector = movement;
         destinationRotation = Quaternion.LookRotation(Vector3.forward, destinationVector);
 
-        Debug.DrawLine(transform.position, transform.position + (Vector3)destinationVector, Color.red, 1f);
+        OnMovementStarted?.Invoke(movementSpeed);
+    }
+
+    protected void StopMoving()
+    {
+        isMoving = false;
+
+        OnMovementStopped?.Invoke();
     }
 
     private void FixedUpdate()
     {
+        if (isReversing)
+        {
+            horseRb.velocity = -transform.up * movementSpeed * 0.5f * Time.fixedDeltaTime;
+            return;
+        }
+
         if (!isMoving)
         {
             // If not moving, stop moving.
@@ -78,23 +86,14 @@ public class DriverBehavior : MonoBehaviour
 
         float scaledMovementSpeed = movementSpeed * Time.fixedDeltaTime;
 
-        // Rotates at a speed of 10 degrees per second from the current
-        // facing direction to the destination direction.
-        // Rotate around the back of the vehicle.
+        // Transform up dictates the forward direction of the vehicle.
         if ((Vector2)transform.up != destinationVector)
         {
             float step = rotationSpeed * Time.fixedDeltaTime;
 
             Quaternion rotation = Quaternion.RotateTowards(transform.rotation, destinationRotation, step);
 
-            // Rotate around the pivot point towards the destination rotation.
-            Vector3 pivot = transform.position - transform.up;
-
-            Debug.DrawLine(transform.position, pivot, Color.blue, 0.01f);
-
-            transform.RotateAround(pivot, Vector3.forward, rotation.eulerAngles.z - transform.rotation.eulerAngles.z);
-
-            Debug.DrawLine(transform.position, transform.position + (Vector3)transform.up, Color.green, 0.01f);
+            transform.RotateAround(transform.position, Vector3.forward, rotation.eulerAngles.z - transform.rotation.eulerAngles.z);
 
             float ratio = Quaternion.Angle(transform.rotation, destinationRotation) / 180f;
 

@@ -166,7 +166,7 @@ public class TaxiPoint : MonoBehaviour
         foreach (GameObject passengerGameObject in new List<GameObject>()) //taxiTripManager.PassengerGameObjects)
         {
             // Stop the fare counting
-            FareManager.Instance.EndFareComputation();
+            //FareManager.Instance.EndFareComputation();
 
             // Reenable the visibility of the passenger game object
             passengerGameObject.SetActive(true);

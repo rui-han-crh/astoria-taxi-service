@@ -34,7 +34,7 @@ public class AutoDestroy : MonoBehaviour
 
         if (Vector3.Distance(transform.position, playerTransform.position) > maxDistance)
         {
-            Destroy(gameObject);
+            Destroy(gameObject.transform.root.gameObject);
         }
     }
 }

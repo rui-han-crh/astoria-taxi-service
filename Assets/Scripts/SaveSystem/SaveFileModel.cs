@@ -17,16 +17,27 @@ public struct SaveFileModel
 
     public FareManagerModel FareManagerModel { get; set; }
 
+    public WalletModel WalletModel { get; set; }
+
+    public HungerModel HungerModel { get; set; }
+
+    public MaintenanceModel MaintenanceModel { get; set; }
+
     public SaveFileModel(
         TaxiModel taxiModel, 
         PassengerBehaviourModel passengerBehaviourModel,
         TripManagerModel tripManagerModel,
         FareManagerModel fareManagerModel,
-        string test)
+        WalletModel walletModel,
+        HungerModel hungerModel,
+        MaintenanceModel maintenanceModel)
     {
         TaxiModel = taxiModel;
         PassengerBehaviourModel = passengerBehaviourModel;
         TripManagerModel = tripManagerModel;
         FareManagerModel = fareManagerModel;
+        WalletModel = walletModel;
+        HungerModel = hungerModel;
+        MaintenanceModel = maintenanceModel;
     }
 }

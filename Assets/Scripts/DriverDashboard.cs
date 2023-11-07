@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using DG.Tweening;
 
 /// <summary>
 /// Manages all the UI updates in the driver dashboard
@@ -16,12 +17,36 @@ public class DriverDashboard : MonoBehaviour
         instance = this;
     }
 
-    public TMP_Text destinationText;
-    public TMP_Text fareText;
-    public TMP_Text distanceText;
-    public Image directionPointer;
+    [SerializeField]
+    private Transform uiParent;
+    [SerializeField]
+    private TMP_Text destinationText;
+    [SerializeField]
+    private TMP_Text fareText;
+    [SerializeField]
+    private TMP_Text distanceText;
+    [SerializeField]
+    private Image directionPointer;
 
     public TMP_Text vacantText, hiredText, offText;
+
+    private float originalUiParentX;
+    
+    private void Start()
+    {
+        originalUiParentX = uiParent.localPosition.x;
+    }
+
+    public void HideUI(float duration=0.5f)
+    {
+        float uiParentWidth = uiParent.GetComponent<RectTransform>().rect.width;
+        uiParent.DOLocalMoveX(uiParent.localPosition.x - uiParentWidth, duration).SetEase(Ease.OutBack);
+    }
+
+    public void ShowUI(float duration=0.5f)
+    {
+        uiParent.DOLocalMoveX(originalUiParentX, duration).SetEase(Ease.InBack);
+    }
 
     /// <summary>
     /// Updates the destination text in driver dashboard UI

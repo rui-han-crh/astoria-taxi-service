@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>
 /// Represents the player taxi.
@@ -14,10 +15,22 @@ using UnityEngine;
 public class Taxi : MonoBehaviour, ISaveable<TaxiModel>
 {
     [SerializeField]
+    private CollisionEventEmitter carriage;
+
+    [SerializeField]
+    private CollisionEventEmitter horses;
+
+    public Vector3 CarriagePosition => carriage.transform.position;
+
+    public Vector3 HorsesPosition => horses.transform.position;
+
     private PassengerBehaviour passengerBehaviour; 
     // If there is no passenger approaching, this will be null.
 
     private TripManager manager;
+
+    public event Action OnBoard;
+    public event Action OnDropOff;
 
     private void Awake()
     {
@@ -32,6 +45,18 @@ public class Taxi : MonoBehaviour, ISaveable<TaxiModel>
     private void Start()
     {
         RestoreStateFromModel();
+
+        carriage.OnTriggerEnterAction += (action) =>
+        {
+            action.Invoke(this.gameObject);
+        };
+
+        carriage.OnTriggerEnterGameObject += AssignPassenger;
+
+        horses.OnTriggerEnterAction += (action) =>
+        {
+            action.Invoke(this.gameObject);
+        };
     }
 
     public bool Hail()
@@ -61,7 +86,11 @@ public class Taxi : MonoBehaviour, ISaveable<TaxiModel>
             throw new Exception("Cannot board a passenger that is not the current passenger approaching.");
         }
 
+        OnBoard?.Invoke();
+
         manager.BeginRide();
+
+        carriage.GetComponent<NavMeshObstacle>().enabled = true;
     }
 
     /// <summary>
@@ -73,11 +102,15 @@ public class Taxi : MonoBehaviour, ISaveable<TaxiModel>
     /// <param name="passengerPathTarget"> The target position for the passenger to path to. </param>
     public void DropOffPassenger(Vector3 passengerPathTarget)
     {
+        OnDropOff?.Invoke();
+
         passengerBehaviour.gameObject.SetActive(true);
 
         passengerBehaviour.transform.parent = null;
 
         passengerBehaviour.SwitchToDropOffState(passengerPathTarget);
+
+        passengerBehaviour = null;
     }
 
     public void CancelHail(PassengerBehaviour hailTaxiBehaviour)
@@ -85,36 +118,53 @@ public class Taxi : MonoBehaviour, ISaveable<TaxiModel>
         if (passengerBehaviour == hailTaxiBehaviour)
         {
             passengerBehaviour = null;
+            carriage.GetComponent<NavMeshObstacle>().enabled = true;
         }
     }
 
     /**
      * Assigns the passenger whose radius indicator collided with this object to the passenger.
      */
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void AssignPassenger(GameObject passengerPickUpArea)
     {
-        if (collision.gameObject.CompareTag("Passenger"))
+        if (passengerPickUpArea.CompareTag(Tags.Passenger)) 
         {
-            passengerBehaviour = collision.transform.parent.GetComponent<PassengerBehaviour>();
+            passengerBehaviour = passengerPickUpArea.transform.parent.GetComponent<PassengerBehaviour>();
             passengerBehaviour.SwitchToApproachState();
+            carriage.GetComponent<NavMeshObstacle>().enabled = false;
         }
     }
 
     public TaxiModel ToModel()
     {
-        return new TaxiModel(HasPassenger());
+        Vector2 carriagePosition = CarriagePosition;
+        Quaternion carriageRotation = carriage.transform.rotation;
+        Vector2 horsesPosition = HorsesPosition;
+        Quaternion horsesRotation = horses.transform.rotation;
+
+        return new TaxiModel(HasPassenger(), carriagePosition, carriageRotation, horsesPosition, horsesRotation);
     }
 
     public void RestoreStateFromModel()
     {
-        TaxiModel taxiModel = SaveManager.LoadTaxiModel();
+        TaxiModel? taxiModel = SaveManager.LoadTaxiModel();
 
-        print(taxiModel.HasPassenger);
+        if (taxiModel == null)
+        {
+            return;
+        }
 
-        if (taxiModel.HasPassenger)
+        if (taxiModel.Value.HasPassenger)
         {
             passengerBehaviour = PassengerBehaviour.CreateFromSaveFile();
+
+            passengerBehaviour.transform.parent = transform;
+            passengerBehaviour.transform.localPosition = Vector3.zero;
+            passengerBehaviour.gameObject.SetActive(false);
         }
+
+        carriage.transform.SetPositionAndRotation(taxiModel.Value.CarriagePosition, taxiModel.Value.CarriageRotation);
+        horses.transform.SetPositionAndRotation(taxiModel.Value.HorsesPosition, taxiModel.Value.HorsesRotation);
     }
 
     public void Save(bool writeImmediately = true)
@@ -125,5 +175,9 @@ public class Taxi : MonoBehaviour, ISaveable<TaxiModel>
         {
             SaveManager.SavePassengerBehaviour(passengerBehaviour, writeImmediately);
         }
+    }
+    private void OnDestroy()
+    {
+        SaveManager.Instance.OnSaveRequested -= Save;
     }
 }

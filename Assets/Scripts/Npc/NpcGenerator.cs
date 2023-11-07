@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
 
 /**
  * Generates an NPC in a point that is some distance away from the player.
@@ -16,57 +14,16 @@ using UnityEngine.UI;
  * The generation takes place once at the start. Then, at random intervals,
  * generations will take place again.
  */
-public class GenerateNpc : MonoBehaviour
+public class NpcGenerator : PrefabGenerator
 {
-    private static readonly string PLAYER_TAG = "Player";
-    private static readonly string PEDESTRIAN_AREA_STRING = "Pavement";
-
-    private Transform playerTransform;
-
-    private float timeToNextGeneration = 3f;
-
-    private int pedestrianAreaIndex;
-
-    private void Awake()
-    {
-        // Find the player
-        playerTransform = GameObject.FindGameObjectWithTag(PLAYER_TAG).transform;
-
-        // Assign the pedestrian mask
-        pedestrianAreaIndex = NavMesh.GetAreaFromName(PEDESTRIAN_AREA_STRING);
-
-        if (pedestrianAreaIndex == -1)
-        {
-            Debug.LogError($"Could not find pedestrian mask with name {PEDESTRIAN_AREA_STRING}");
-        }
-    }
+    private readonly NavMeshAreas pedestrianArea = NavMeshAreas.Pavement;
 
     private void Start()
     {
-        Generate(5, 0, 20);
+        Generate(maxInstancesPerGeneration, 0, 20);
     }
 
-    // Update is called once per frame
-    private void Update()
-    {
-        if (timeToNextGeneration <= 0f)
-        {
-            // Generate some number of NPCs
-            int numberOfNpcs = Random.Range(1, 6);
-
-            Generate(numberOfNpcs);
-
-            // Set the time to the next generation
-            timeToNextGeneration = Random.Range(1f, 10f);
-        }
-        else
-        {
-            // Decrease the time to the next generation
-            timeToNextGeneration -= Time.deltaTime;
-        }
-    }
-
-    private void Generate(int numberOfNpcs, float minDistance = 20, float maxDistance = 40)
+    protected override void Generate(int numberOfNpcs, float minDistance = 20, float maxDistance = 40)
     {
         for (int i = 0; i < numberOfNpcs; i++)
         {
@@ -105,7 +62,7 @@ public class GenerateNpc : MonoBehaviour
     private Vector3 GetClosestPointOnNavMesh(int radius, Vector3 point)
     {
         // Get the closest point on the NavMesh to the random point
-        if (!NavMesh.SamplePosition(point, out NavMeshHit hit, radius, 1 << pedestrianAreaIndex))
+        if (!NavMesh.SamplePosition(point, out NavMeshHit hit, radius, (AreaMask)pedestrianArea))
         {
             // If the point is not on the NavMesh, then try again with a larger radius
             return GetClosestPointOnNavMesh(radius * 2, point);

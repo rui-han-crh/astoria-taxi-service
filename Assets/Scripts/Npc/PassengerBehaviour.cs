@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -26,8 +27,8 @@ using UnityEngine;
 public class PassengerBehaviour : MonoBehaviour
 {
     private static readonly float TAXI_PASSENGER_DISTANCE_THRESHOLD = 10f;
-    private static readonly float APPROACH_THRESHOLD = 0.1f;
-    private static readonly float PROBABILITY = 0.1f;
+    private static readonly float APPROACH_THRESHOLD = 1f;
+    private static readonly float PROBABILITY = 0.2f;
 
     private Passenger passenger;
 
@@ -58,19 +59,27 @@ public class PassengerBehaviour : MonoBehaviour
 
     public static PassengerBehaviour CreateFromSaveFile()
     {
-        PassengerBehaviourModel passengerBehaviourModel = SaveManager.LoadPassengerBehaviourModel();
+        PassengerBehaviourModel? passengerBehaviourModelOptional = SaveManager.LoadPassengerBehaviourModel();
+
+        if (passengerBehaviourModelOptional == null)
+        {
+            return null;
+        }
+
+        PassengerBehaviourModel passengerBehaviourModel = passengerBehaviourModelOptional.Value;
 
         string reference = passengerBehaviourModel.Passenger.ResourceFileReference;
 
-        print($"Constructing passenger from reference: {reference}");
+        GameObject passengerGameObjectPrefab = ResourceManager.Instance.Load<GameObject>(reference);
 
-        GameObject passengerGameObject = ResourceManager.Instance.Load<GameObject>(reference);
+        GameObject passengerGameObject = Instantiate(passengerGameObjectPrefab);
 
         PassengerBehaviour passengerBehaviour = passengerGameObject.GetComponent<PassengerBehaviour>();
 
         passengerBehaviour.passenger = passengerBehaviourModel.Passenger;
         passengerBehaviour.state = passengerBehaviourModel.PassengerState;
         passengerBehaviour.timeLeftInState = passengerBehaviourModel.TimeLeftInState;
+        passengerBehaviour.npcRoamBehaviour.enabled = false;
 
         return passengerBehaviour;
     }
@@ -117,20 +126,20 @@ public class PassengerBehaviour : MonoBehaviour
                 break;
 
             case PassengerState.Approaching:
-                if (Vector2.Distance(transform.position, taxi.transform.position) > TAXI_PASSENGER_DISTANCE_THRESHOLD)
+                if (Vector2.Distance(transform.position, taxi.CarriagePosition) > TAXI_PASSENGER_DISTANCE_THRESHOLD)
                 {
                     taxi.CancelHail(this);
                     SwitchToWanderState();
                     break;
                 }
 
-                if (Vector2.Distance(transform.position, taxi.transform.position) < APPROACH_THRESHOLD)
+                if (Vector2.Distance(transform.position, taxi.CarriagePosition) < APPROACH_THRESHOLD)
                 {
                     BoardTaxi();
                     break;
                 }
 
-                navmeshAgentMovement.SetDestination(taxi.transform.position);
+                navmeshAgentMovement.SetDestination(taxi.CarriagePosition);
                 break;
         }
     }
@@ -151,6 +160,12 @@ public class PassengerBehaviour : MonoBehaviour
         timeLeftInState = 5f;
     }
 
+    /// <summary>
+    /// Sets the passenger to the approaching state and causes the passenger to path to the taxi.
+    /// 
+    /// This class contains a reference to the carriage body, which serves as the passenger's
+    /// destination.
+    /// </summary>
     public void SwitchToApproachState()
     {
         greenCircle.SetActive(false);

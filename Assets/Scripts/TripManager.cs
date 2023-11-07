@@ -13,12 +13,17 @@ public class TripManager : MonoBehaviour, ISaveable<TripManagerModel>
 
     private House destinationHouse;
 
+    [SerializeField]
     private Taxi taxi;
+
+    [SerializeField]
+    private FareManager fareManager;
+
+    [SerializeField]
+    private DriverDashboard driverDashboard;
 
     private void Awake()
     {
-        taxi = GetComponent<Taxi>();
-
         SaveManager.Instance.OnSaveRequested += Save;
     }
 
@@ -27,13 +32,41 @@ public class TripManager : MonoBehaviour, ISaveable<TripManagerModel>
         RestoreStateFromModel();
     }
 
+    private void Update()
+    {
+        if (destinationHouse)
+        {
+            Vector2 vectorToHouseFromTaxi = destinationHouse.DoorTransform.position - taxi.transform.position;
+            driverDashboard.UpdateDirection(vectorToHouseFromTaxi.normalized);
+
+            int distanceToHouse = Mathf.RoundToInt(vectorToHouseFromTaxi.magnitude);
+            driverDashboard.UpdateDistance(distanceToHouse);
+        }
+    }
+
     public void BeginRide()
     {
-        FareManager.Instance.StartFareComputation(500, 10, 2);
+        driverDashboard.ShowUI();
 
         destinationHouse = House.GetRandomHouse();
 
+        fareManager.OnComputationTick += driverDashboard.UpdateFare;
+        fareManager.StartFareComputation(GetEstimatedFare(destinationHouse.transform.position), 10, 2);
+
+        driverDashboard.UpdateDestination(destinationHouse.name);
+
         SetDropOffLocation();
+    }
+
+    private int GetEstimatedFare(Vector2 destination)
+    {
+        // Get the distance to the destination.
+        float distance = Vector2.Distance(taxi.transform.position, destination);
+
+        float randomMultiplier = Random.Range(3f, 5f);
+
+        // Get the estimated fare.
+        return Mathf.RoundToInt(distance * randomMultiplier);
     }
 
     private void SetDropOffLocation()
@@ -49,13 +82,23 @@ public class TripManager : MonoBehaviour, ISaveable<TripManagerModel>
         // Find the closest point on the navmesh road area to the drop off location.
         NavMesh.SamplePosition(dropOffLocation, out NavMeshHit hit, 30f, (AreaMask)NavMeshAreas.Road);
 
+        // Pad the location, so that it is some distance away from the edge of the road.
+        Vector3 paddedLocation = hit.position + (hit.position - (Vector3)dropOffLocation).normalized;
+
         // Instantiate the drop off indicator at the closest point on the navmesh.
-        Instantiate(dropOffIndicatorPrefab, hit.position, Quaternion.identity);
+        Instantiate(dropOffIndicatorPrefab, paddedLocation, Quaternion.identity);
     }
 
     public void DropOff()
     {
-        FareManager.Instance.EndFareComputation();
+        fareManager.OnComputationTick -= driverDashboard.UpdateFare;
+        fareManager.EndFareComputation();
+
+        driverDashboard.HideUI();
+        driverDashboard.UpdateFare(0);
+        driverDashboard.UpdateDestination("Narnia >:)");
+        driverDashboard.UpdateDirection(Vector2.zero);
+        driverDashboard.UpdateDistance(0);
 
         taxi.DropOffPassenger(destinationHouse.DoorTransform.position);
 
@@ -71,20 +114,25 @@ public class TripManager : MonoBehaviour, ISaveable<TripManagerModel>
         }
         else
         {
-            return new TripManagerModel(destinationHouse.name);
+            return new TripManagerModel(destinationHouse.UniqueKey);
         }
     }
 
     public void RestoreStateFromModel()
     {
-        TripManagerModel tripManagerModel = SaveManager.LoadTripManagerModel();
+        TripManagerModel? tripManagerModel = SaveManager.LoadTripManagerModel();
 
-        if (tripManagerModel.DestinationHouseName == null)
+        if (tripManagerModel == null || tripManagerModel.Value.DestinationHouseName == null)
         {
+            driverDashboard.HideUI(0);
             return;
         }
 
-        destinationHouse = House.FindByName(tripManagerModel.DestinationHouseName);
+        destinationHouse = House.FindByName(tripManagerModel.Value.DestinationHouseName);
+
+        driverDashboard.UpdateDestination(destinationHouse.name);
+
+        SetDropOffLocation();
     }
 
     public void Save(bool writeImmediately = true)

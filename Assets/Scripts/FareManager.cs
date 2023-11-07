@@ -1,30 +1,29 @@
 using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class FareManager : MonoBehaviour, ISaveable<FareManagerModel>
 {
-    private static FareManager instance;
-    public static FareManager Instance { get => instance;}
+    [SerializeField]
+    private Wallet wallet;
 
     private bool isComputingFare = false;
     private int currentFare;
     private int fareFloor;
     private int decrementAmount;
 
+    /// <summary>
+    /// An event that invokes every second when the fare is being computed.
+    /// </summary>
+    public event Action<int> OnComputationTick;
+
     private void Awake()
     {
-        if (instance != null)
-        {
-            Debug.LogError("More than one FareComputationManager in the scene.");
-            Destroy(this);
-            return;
-        }
-
-        instance = this;
-
         SaveManager.Instance.OnSaveRequested += Save;
+
+        wallet = GetComponent<Wallet>();
     }
 
     private void Start()
@@ -45,16 +44,6 @@ public class FareManager : MonoBehaviour, ISaveable<FareManagerModel>
         StartCoroutine(ComputeFare(startingFare));
     }
 
-    // Not needed for now
-    /*
-    public void TerminateFareComputation()
-    {
-        computingFare = false;
-        StopCoroutine("FareComputation");
-        DriverDashboard.instance.UpdateFare(0);
-    }
-    */
-
     /// <summary>
     /// Ends the fare computation and adds the fare to the wallet.
     /// </summary>
@@ -65,15 +54,16 @@ public class FareManager : MonoBehaviour, ISaveable<FareManagerModel>
         // The process of adding the fare to the wallet is done in the coroutine.
     }
 
-    // Ticks every second to calculate the fare
+    /// <summary>
+    /// Computes the fare per second. This is a coroutine that ticks every second.
+    /// </summary>
+    /// <param name="baseFare"> The starting fare. </param>
     private IEnumerator ComputeFare(int baseFare)
     {
-        // We should not try to retrieve from save file. The data is kept locally until there is a need to save.
-
-        //OldTripState tripState = SaveManager.GetTripState();
-
         currentFare = baseFare;
-        DriverDashboard.instance.UpdateFare(currentFare);
+        
+        OnComputationTick?.Invoke(currentFare);
+
         while (isComputingFare)
         {
             yield return new WaitForSeconds(1);
@@ -81,17 +71,13 @@ public class FareManager : MonoBehaviour, ISaveable<FareManagerModel>
             if (currentFare > fareFloor)
             {
                 currentFare = Mathf.Max(currentFare - decrementAmount, fareFloor);
-                //SaveManager.UpdateTripState(tripState);
-                DriverDashboard.instance.UpdateFare(currentFare);
+                OnComputationTick?.Invoke(currentFare);
 
             }
         }
 
-        // End of fare computation, add the fare to the wallet
-        DriverDashboard.instance.UpdateFare(0);
-
-        WalletSystem.Instance.IncreaseBalance(currentFare);
-        StatsUIPanel.instance.UpdateBalance(WalletSystem.Instance.GetBalance());
+        wallet.IncreaseBalance(currentFare);
+        wallet.UpdateDisplay();
     }
 
     public FareManagerModel ToModel()
@@ -101,14 +87,17 @@ public class FareManager : MonoBehaviour, ISaveable<FareManagerModel>
 
     public void RestoreStateFromModel()
     {
-        FareManagerModel fareManagerModel = SaveManager.LoadFareManagerModel();
+        FareManagerModel? fareManagerModel = SaveManager.LoadFareManagerModel();
 
-        isComputingFare = fareManagerModel.IsComputingFare;
-        currentFare = fareManagerModel.CurrentFare;
-        fareFloor = fareManagerModel.FareFloor;
-        decrementAmount = fareManagerModel.DecrementAmount;
+        if (fareManagerModel == null)
+        {
+            return;
+        }
 
-        print($"Restored fare manager state: {isComputingFare}, {currentFare}, {fareFloor}, {decrementAmount}");
+        isComputingFare = fareManagerModel.Value.IsComputingFare;
+        currentFare = fareManagerModel.Value.CurrentFare;
+        fareFloor = fareManagerModel.Value.FareFloor;
+        decrementAmount = fareManagerModel.Value.DecrementAmount;
 
         if (isComputingFare)
         {

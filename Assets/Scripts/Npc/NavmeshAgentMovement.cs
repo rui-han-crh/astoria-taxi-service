@@ -44,7 +44,6 @@ public class NavmeshAgentMovement : MonoBehaviour
     {
         if (HasReachedDestination())
         {
-            print("Reached destination");
             OnDestinationReached?.Invoke(agent);
         }
     }

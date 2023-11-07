@@ -20,9 +20,14 @@ public class House : MonoBehaviour
 
     private void Awake()
     {
-        houseMap.Add(name, this);
-        houseList.Add(this);
+        if (!houseMap.ContainsKey(UniqueKey))
+        {
+            houseMap.Add(UniqueKey, this);
+            houseList.Add(this);
+        }
     }
+
+    public string UniqueKey { get => name + " " + doorTransform.name;}
 
     public static House FindByName(string name)
     {

@@ -171,7 +171,7 @@ GameObject:
   - component: {fileID: 4691182287428409001}
   - component: {fileID: 4691182287428409000}
   - component: {fileID: 1321075555837984342}
-  - component: {fileID: 6158039591796025216}
+  - component: {fileID: 1680856089776683963}
   m_Layer: 0
   m_Name: HorseBody
   m_TagString: Untagged
@@ -317,7 +317,7 @@ HingeJoint2D:
   m_AngleLimits:
     m_LowerAngle: 0
     m_UpperAngle: 359
---- !u!114 &6158039591796025216
+--- !u!114 &1680856089776683963
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -326,11 +326,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4691182287428408997}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afb187c0d2384ce4c9ab4c7a91d7e4e3, type: 3}
+  m_Script: {fileID: 11500000, guid: eb78620425fde6c4d92a8215b2ef14cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 80
-  movementSpeed: 250
+  rotationSpeed: 30
+  movementSpeed: 100
   carriageBody: {fileID: 4691182287307354060}
 --- !u!1 &7011560768791035373
 GameObject:

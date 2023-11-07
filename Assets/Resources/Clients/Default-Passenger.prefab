@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4150999918565970496}
   - component: {fileID: 2710779301188274216}
   - component: {fileID: 2343018609748856353}
+  - component: {fileID: 5187411519363963728}
   m_Layer: 0
   m_Name: indicator
   m_TagString: Passenger
@@ -101,6 +102,18 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 1.28
+--- !u!114 &5187411519363963728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121989791604525900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f803606c5a734a46aa4296a5df574d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3819991215480416034
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,7 +236,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 3819991215480416034}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.2
+  m_Radius: 0.5
   m_Speed: 1
   m_Acceleration: 500
   avoidancePriority: 50
@@ -275,7 +288,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   navMeshAreas: 16
-  areaCosts: 0000000000000000000000000100000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!114 &8090590394553850324
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -7,17 +7,13 @@ using UnityEngine.UI;
 /// <summary>
 /// Manages all the UI updates in the stats panel.
 /// </summary>
-public class StatsUIPanel : MonoBehaviour
+public class StatsUiPanel : MonoBehaviour
 {
-    public static StatsUIPanel instance;
+    [SerializeField]
+    private TMP_Text timeText;
 
-    private void Awake()
-    {
-        instance = this;
-    }
-
-    public TMP_Text timeText;
-    public TMP_Text balanceText;
+    [SerializeField]
+    private TMP_Text balanceText;
 
     /// <summary>
     /// Sets the time displayed in the stats panel.
