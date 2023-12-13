@@ -38,4 +38,10 @@ public class House : MonoBehaviour
     {
         return houseList[Random.Range(0, houseList.Count)];
     }
+
+    public void OnDestroy()
+    {
+        houseMap.Remove(UniqueKey);
+        houseList.Remove(this);
+    }
 }

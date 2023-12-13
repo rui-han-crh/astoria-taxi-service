@@ -215,5 +215,6 @@ public class SaveManager
     public static void DeleteSaveFile()
     {
         File.Delete(SAVE_FILE_PATH);
+        Instance.saveFileModel = null;
     }
 }

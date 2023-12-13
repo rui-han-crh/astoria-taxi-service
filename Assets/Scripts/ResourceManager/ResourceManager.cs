@@ -8,12 +8,10 @@ using UnityEngine;
 /// 
 /// Once loaded, resources are cached in a dictionary.
 /// 
-/// This class is a singleton and is not destroyed on scene load.
-/// It is kept alive for the entire game.
+/// This class behaves singleton and is never destroyed for the entire lifecycle of the program.
 /// </summary>
-public class ResourceManager : MonoBehaviour
+public static class ResourceManager
 {
-    public static ResourceManager Instance { get; private set; }
 
     /// <summary>
     /// This dictionary mirrors the Resources folder structure.
@@ -21,20 +19,7 @@ public class ResourceManager : MonoBehaviour
     /// The value mapped to may be either a folder, in which case it is represented as a string,
     /// or a file, in which case it is represented as a GameObject.
     /// </summary>
-    private readonly Dictionary<string, object> resources = new Dictionary<string, object>();
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(this);
-            return;
-        }
-
-        Destroy(gameObject);
-        Debug.LogWarning("You tried to instantiate a second ResourceManager. Only one is allowed.");
-    }
+    private static readonly Dictionary<string, object> resources = new Dictionary<string, object>();
 
     /// <summary>
     /// Returns all the resources at the given path from the cache.
@@ -47,7 +32,7 @@ public class ResourceManager : MonoBehaviour
     /// <typeparam name="T"></typeparam>
     /// <param name="path"></param>
     /// <returns></returns>
-    public T[] LoadAll<T>(string path) where T : Object
+    public static T[] LoadAll<T>(string path) where T : Object
     {
         string[] splitPath = path.Split('/');
 
@@ -80,69 +65,57 @@ public class ResourceManager : MonoBehaviour
     /// <typeparam name="T"></typeparam>
     /// <param name="path"></param>
     /// <returns></returns>
-    public T Load<T>(string path) where T : Object
+    public static T Load<T>(string path) where T : Object
     {
         string[] splitPath = path.Split('/');
 
         try
         {
-            print("Finding in cache");
             T foundValue = (T)GetNestedValue(splitPath);
             return foundValue;
         }
         catch (System.Exception)
         {
-            print("Not in cache, loading from resources");
             T resource = Resources.Load<T>(path);
-            print(resources.Count);
             AddResource(splitPath, resource);
             return resource;
         }
     }
 
-    private void AddResource(string[] keys, object resource)
+    private static void AddResource(string[] keys, object resource)
     {
-        var current = Instance.resources;
-        print("The split path is " + string.Join(" ", keys));
+        var current = resources;
 
         // We exclude the last key because that is the name of the resource.
         // Every prior key maps string => Dictionary<string, object> representing a folder.
         // The last key maps the string to the resource itself.
         for (int i = 0; i < keys.Length - 1; i++)
         {
-            print(keys[i]);
             if (!current.ContainsKey(keys[i]))
             {
-                print("Adding key " + keys[i] + "mapped to a new dictionary");
                 current[keys[i]] = new Dictionary<string, object>();
             }
 
             current = (Dictionary<string, object>)current[keys[i]];
         }
-
-        print("Adding key " + keys.Last() + " mapped to " + resource.ToString());
         current[keys.Last()] = resource;
     }
 
     private static object GetNestedValue(params string[] keys)
     {
-        print(string.Join("/", keys));
         if (keys.Length == 0)
         {
             throw new System.Exception("No keys provided");
         }
 
-        var current = Instance.resources;
+        var current = resources;
 
         for (int i = 0; i < keys.Length - 1; i++)
         {
             if (!current.ContainsKey(keys[i]))
             {
-                print("No resource found at path " + string.Join("/", keys));
                 throw new System.Exception($"No resource found at path {string.Join("/", keys)}");
             }
-
-            print("Found key: " + keys[i]);
 
             current = (Dictionary<string, object>)current[keys[i]];
         }

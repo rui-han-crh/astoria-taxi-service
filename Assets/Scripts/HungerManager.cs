@@ -54,10 +54,6 @@ public class HungerManager : MonoBehaviour, ISaveable<HungerModel>
                 return;
             }
         }
-        else
-        {
-            currentSatiation += Time.deltaTime;
-        }
 
         currentSatiation = Mathf.Clamp(currentSatiation, 0f, maxSatiation);
         meterController.ChangeFill(currentSatiation / maxSatiation);

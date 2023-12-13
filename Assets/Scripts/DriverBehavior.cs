@@ -15,6 +15,9 @@ public abstract class DriverBehavior : MonoBehaviour
     /// Represents the destination vector of the vehicle.
     /// </summary>
     protected Vector2 destinationVector;
+
+    public Vector2 DestinationVector => destinationVector;
+
     protected Quaternion destinationRotation;
 
     protected Rigidbody2D horseRb;
@@ -37,8 +40,15 @@ public abstract class DriverBehavior : MonoBehaviour
     public GameObject CarriageBody => carriageBody;
 
     protected bool isMoving = false;
+    public bool IsMoving => isMoving;
+
     protected bool isReversing = false;
+    public bool IsReversing => isReversing;
+
     protected bool isRotating = false;
+    public bool IsRotating => isRotating;
+
+    private float accelerationRatio = 0f;
 
     public delegate void MovementStarted(float movementSpeed);
     public event MovementStarted OnMovementStarted;
@@ -50,6 +60,9 @@ public abstract class DriverBehavior : MonoBehaviour
         {
             Debug.LogError("Driver must have a Rigidbody2D component.");
         }
+
+        destinationVector = transform.up;
+        destinationRotation = transform.rotation;
     }
 
     protected void TriggerMovement(Vector2 movement)
@@ -79,10 +92,13 @@ public abstract class DriverBehavior : MonoBehaviour
 
         if (!isMoving)
         {
-            // If not moving, stop moving.
-            horseRb.velocity = Vector2.zero;
+            accelerationRatio -= Time.fixedDeltaTime * 2f;
+            accelerationRatio = Mathf.Clamp(accelerationRatio, 0f, 1f);
             return;
         }
+
+        accelerationRatio += Time.fixedDeltaTime * 0.5f;
+        accelerationRatio = Mathf.Clamp(accelerationRatio, 0f, 1f);
 
         float scaledMovementSpeed = movementSpeed * Time.fixedDeltaTime;
 
@@ -97,10 +113,11 @@ public abstract class DriverBehavior : MonoBehaviour
 
             float ratio = Quaternion.Angle(transform.rotation, destinationRotation) / 180f;
 
-            scaledMovementSpeed *= 1  - ratio;
+            // Scale movement speed based on how far the vehicle is from the destination rotation.
+            scaledMovementSpeed *= 1 - ratio;
         }
 
         // Move in the direction of the destination vector.
-        horseRb.velocity = transform.up * scaledMovementSpeed;
+        horseRb.velocity = transform.up * scaledMovementSpeed * accelerationRatio;
     }
 }

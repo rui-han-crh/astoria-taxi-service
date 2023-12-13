@@ -48,7 +48,13 @@ public class PassengerBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        taxi = GameObject.FindGameObjectWithTag("Player").GetComponent<Taxi>();
+        taxi = GameObject.FindGameObjectWithTag(Tags.Player).GetComponent<Taxi>();
+
+        if (taxi == null)
+        {
+            Debug.LogError("The player gameobject does not have a taxi component.");
+        }
+
         npcRoamBehaviour = GetComponent<NpcRoamBehaviour>();
         navmeshAgentMovement = GetComponent<NavmeshAgentMovement>();
 
@@ -70,7 +76,7 @@ public class PassengerBehaviour : MonoBehaviour
 
         string reference = passengerBehaviourModel.Passenger.ResourceFileReference;
 
-        GameObject passengerGameObjectPrefab = ResourceManager.Instance.Load<GameObject>(reference);
+        GameObject passengerGameObjectPrefab = ResourceManager.Load<GameObject>(reference);
 
         GameObject passengerGameObject = Instantiate(passengerGameObjectPrefab);
 

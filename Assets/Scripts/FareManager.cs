@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FareManager : MonoBehaviour, ISaveable<FareManagerModel>
+public class FareManager : ISaveable<FareManagerModel>
 {
     [SerializeField]
     private Wallet wallet;

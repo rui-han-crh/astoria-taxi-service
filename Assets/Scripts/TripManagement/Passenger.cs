@@ -19,7 +19,7 @@ public readonly struct Passenger
 
     public static Passenger GetRandomPassenger()
     {
-        GameObject[] clients = ResourceManager.Instance.LoadAll<GameObject>("Clients");
+        GameObject[] clients = ResourceManager.LoadAll<GameObject>("Clients");
 
         int randomIndex = UnityEngine.Random.Range(0, clients.Length);
 

@@ -35,7 +35,7 @@ public class NpcGenerator : PrefabGenerator
 
             Passenger passenger = Passenger.GetRandomPassenger();
 
-            GameObject passengerPrefab = ResourceManager.Instance.Load<GameObject>(passenger.ResourceFileReference);
+            GameObject passengerPrefab = ResourceManager.Load<GameObject>(passenger.ResourceFileReference);
 
             // Instantiate the NPC
             Instantiate(passengerPrefab, closestPoint, Quaternion.identity);
